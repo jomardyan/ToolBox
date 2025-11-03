@@ -8,7 +8,7 @@ import logger from './utils/logger';
 import { RATE_LIMIT_CONFIG } from './utils/validation';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = parseInt(process.env.PORT || '3000', 10);
 
 // Rate limiters
 const generalLimiter = rateLimit(RATE_LIMIT_CONFIG.normal);
@@ -16,10 +16,33 @@ const strictLimiter = rateLimit(RATE_LIMIT_CONFIG.strict);
 const batchLimiter = rateLimit(RATE_LIMIT_CONFIG.batch);
 
 // Middleware
-app.use(cors({
-  origin: process.env.CORS_ORIGIN || ['http://localhost:5173', 'http://localhost:3000'],
+const corsOptions = {
+  origin: function(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+    const allowedOrigins = [
+      'http://localhost:5173',
+      'http://localhost:3000',
+      'http://127.0.0.1:5173',
+      'http://127.0.0.1:3000',
+    ];
+
+    // Add github.dev domains (Codespaces)
+    if (origin && origin.includes('.app.github.dev')) {
+      allowedOrigins.push(origin);
+    }
+
+    // If no origin (like server requests), allow it
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
-}));
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+};
+
+app.use(cors(corsOptions));
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.text({ limit: '50mb' }));
@@ -61,9 +84,9 @@ app.get('/', (req, res) => {
 // Error handling middleware (must be last)
 app.use(errorHandler);
 
-// Start server
-app.listen(PORT, () => {
-  logger.info(`Server running on http://localhost:${PORT}`);
+// Start server - bind to 0.0.0.0 to make it accessible from frontend
+app.listen(PORT, '0.0.0.0', () => {
+  logger.info(`Server running on http://0.0.0.0:${PORT}`);
   logger.info(`Environment: ${process.env.NODE_ENV || 'development'}`);
   logger.info(`CORS enabled for: ${process.env.CORS_ORIGIN || 'localhost'}`);
 });

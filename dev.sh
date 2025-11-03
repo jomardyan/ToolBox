@@ -210,12 +210,37 @@ log_success "Frontend started (PID: $FRONTEND_PID)"
 cd ..
 
 echo ""
+
+# Health check the backend API
+log_info "Verifying backend API health..."
+HEALTH_CHECK_SUCCESS=false
+for i in {1..10}; do
+    if curl -s http://localhost:$BACKEND_PORT/api/health > /dev/null 2>&1; then
+        log_success "Backend API is responsive"
+        HEALTH_CHECK_SUCCESS=true
+        break
+    elif [ $i -eq 10 ]; then
+        log_error "Backend API health check failed after 10 attempts"
+        echo ""
+        log_error "Backend logs:"
+        tail -20 "$BACKEND_LOG"
+        kill $BACKEND_PID 2>/dev/null || true
+        kill $FRONTEND_PID 2>/dev/null || true
+        exit 1
+    else
+        echo -ne "${BLUE}[INFO]${NC} Health check attempt $i/10... waiting\r"
+        sleep 1
+    fi
+done
+
+echo ""
 echo -e "${GREEN}╔════════════════════════════════════════════════════════════╗${NC}"
 echo -e "${GREEN}║  Development servers are running!                          ║${NC}"
 echo -e "${GREEN}╠════════════════════════════════════════════════════════════╣${NC}"
 echo -e "${GREEN}║  Backend:  http://localhost:${BACKEND_PORT}${NC}"
 echo -e "${GREEN}║  Frontend: http://localhost:${FRONTEND_PORT}${NC}"
 echo -e "${GREEN}╠════════════════════════════════════════════════════════════╣${NC}"
+echo -e "${GREEN}║  API Health: ✓ Verified${NC}"
 echo -e "${GREEN}║  Logs:${NC}"
 echo -e "${GREEN}║    Backend:  $BACKEND_LOG${NC}"
 echo -e "${GREEN}║    Frontend: $FRONTEND_LOG${NC}"

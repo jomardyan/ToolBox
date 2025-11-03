@@ -1,7 +1,27 @@
 import axios from 'axios';
 import type { ConversionRequest, ConversionResult } from '../types';
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+// Determine API URL based on environment
+let API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+// In GitHub Codespaces, use the port forwarding domain with correct port
+if (typeof window !== 'undefined' && window.location.hostname.includes('github.dev')) {
+  // Extract the codespace name and domain
+  // Format: improved-robot-97ggq5g97792w5q-5173.app.github.dev
+  // Need to change port to 3000: improved-robot-97ggq5g97792w5q-3000.app.github.dev
+  const hostname = window.location.hostname;
+  const isHttps = window.location.protocol === 'https:';
+  
+  // Replace the port number in the hostname
+  const hostnameParts = hostname.split('-');
+  if (hostnameParts.length >= 2) {
+    // Remove the old port from hostname
+    const baseHostname = hostnameParts.slice(0, -1).join('-');
+    const newHostname = `${baseHostname}-3000.app.github.dev`;
+    const protocol = isHttps ? 'https:' : 'http:';
+    API_BASE_URL = `${protocol}//${newHostname}/api`;
+  }
+}
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
