@@ -7,22 +7,23 @@ interface LoadingProps {
 export const Loading: React.FC<LoadingProps> = ({ message = 'Loading...' }) => {
   return (
     <div className="d-flex align-items-center gap-2">
-      <div className="spinner-border spinner-border-sm text-primary" role="status">
+      <div className="spinner-border spinner-border-sm" role="status">
         <span className="visually-hidden">Loading...</span>
       </div>
-      <span className="small text-muted">{message}</span>
+      {message && <span className="small">{message}</span>}
     </div>
   );
 };
 
-interface ErrorAlertProps {
+interface AlertProps {
   message: string;
   onDismiss?: () => void;
+  type: 'danger' | 'success';
 }
 
-export const ErrorAlert: React.FC<ErrorAlertProps> = ({ message, onDismiss }) => {
+export const Alert: React.FC<AlertProps> = ({ message, onDismiss, type }) => {
   return (
-    <div className="alert alert-danger alert-dismissible fade show mb-4" role="alert">
+    <div className={`alert alert-${type} alert-dismissible fade show mb-4`} role="alert">
       <div>{message}</div>
       {onDismiss && (
         <button
@@ -36,26 +37,13 @@ export const ErrorAlert: React.FC<ErrorAlertProps> = ({ message, onDismiss }) =>
   );
 };
 
-interface SuccessAlertProps {
-  message: string;
-  onDismiss?: () => void;
-}
+export const ErrorAlert: React.FC<Omit<AlertProps, 'type'>> = (props) => (
+  <Alert {...props} type="danger" />
+);
 
-export const SuccessAlert: React.FC<SuccessAlertProps> = ({ message, onDismiss }) => {
-  return (
-    <div className="alert alert-success alert-dismissible fade show mb-4" role="alert">
-      <div>{message}</div>
-      {onDismiss && (
-        <button
-          type="button"
-          className="btn-close"
-          onClick={onDismiss}
-          aria-label="Close"
-        ></button>
-      )}
-    </div>
-  );
-};
+export const SuccessAlert: React.FC<Omit<AlertProps, 'type'>> = (props) => (
+  <Alert {...props} type="success" />
+);
 
 interface ButtonProps {
   onClick?: () => void;
@@ -80,7 +68,7 @@ export const Button: React.FC<ButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled || loading}
-      className={`${btnClass} ${className}`}
+      className={`${btnClass} ${className} d-flex align-items-center justify-content-center`}
     >
       {loading ? <Loading message="" /> : children}
     </button>

@@ -5,6 +5,7 @@ import { Button, ErrorAlert, SuccessAlert } from '../components/Common';
 import type { SupportedFormat } from '../types';
 import { conversionService } from '../utils/api';
 import { useAppStore } from '../store/appStore';
+import { FaExchangeAlt, FaTrash, FaDownload, FaCopy } from 'react-icons/fa';
 
 export const HomePage: React.FC = () => {
   const [sourceFormat, setSourceFormat] = useState<SupportedFormat>('csv');
@@ -82,11 +83,9 @@ export const HomePage: React.FC = () => {
   return (
     <div className="container-lg py-5">
       <div className="text-center mb-5">
-        <h2 className="display-5 fw-bold mb-3">
-          Convert Your Files Instantly
-        </h2>
+        <h1 className="display-4 fw-bold mb-3">Universal File Converter</h1>
         <p className="lead text-muted">
-          Support for CSV, JSON, XML, YAML, HTML, TSV, KML, and TXT formats
+          Seamlessly convert between CSV, JSON, XML, YAML, and more.
         </p>
       </div>
 
@@ -96,11 +95,11 @@ export const HomePage: React.FC = () => {
       <div className="row g-4">
         {/* Input Section */}
         <div className="col-lg-6">
-          <div className="card shadow-sm">
+          <div className="card shadow-sm h-100">
             <div className="card-header bg-primary text-white">
               <h5 className="mb-0">Input</h5>
             </div>
-            <div className="card-body">
+            <div className="card-body d-flex flex-column">
               <div className="mb-3">
                 <FormatSelector
                   value={sourceFormat}
@@ -114,20 +113,20 @@ export const HomePage: React.FC = () => {
                 <FileUpload onFileSelect={setInputData} />
               </div>
 
-              <div className="mb-3">
+              <div className="mb-3 flex-grow-1">
                 <label className="form-label fw-medium">Or paste your data:</label>
                 <textarea
                   value={inputData}
                   onChange={(e) => setInputData(e.target.value)}
                   placeholder="Paste your data here..."
-                  className="form-control"
+                  className="form-control h-100"
                   style={{ minHeight: '150px' }}
                 />
               </div>
 
-              <div className="d-grid gap-2 d-sm-flex">
+              <div className="d-grid gap-2 d-sm-flex mt-auto">
                 <Button onClick={handleConvert} loading={loading} className="flex-sm-grow-1">
-                  🔄 Convert
+                  <FaExchangeAlt className="me-2" /> Convert
                 </Button>
                 <Button
                   onClick={() => setInputData('')}
@@ -135,7 +134,7 @@ export const HomePage: React.FC = () => {
                   disabled={!inputData}
                   className="flex-sm-grow-1"
                 >
-                  Clear
+                  <FaTrash className="me-2" /> Clear
                 </Button>
               </div>
             </div>
@@ -144,11 +143,11 @@ export const HomePage: React.FC = () => {
 
         {/* Output Section */}
         <div className="col-lg-6">
-          <div className="card shadow-sm">
+          <div className="card shadow-sm h-100">
             <div className="card-header bg-success text-white">
               <h5 className="mb-0">Output</h5>
             </div>
-            <div className="card-body">
+            <div className="card-body d-flex flex-column">
               <div className="mb-3">
                 <FormatSelector
                   value={targetFormat}
@@ -157,25 +156,25 @@ export const HomePage: React.FC = () => {
                 />
               </div>
 
-              <div className="mb-3">
+              <div className="mb-3 flex-grow-1">
                 <label className="form-label fw-medium">Converted Result</label>
                 <textarea
                   value={outputData}
                   readOnly
                   placeholder="Your converted data will appear here..."
-                  className="form-control bg-light"
+                  className="form-control bg-light h-100"
                   style={{ minHeight: '150px' }}
                 />
               </div>
 
-              <div className="d-grid gap-2 d-sm-flex">
+              <div className="d-grid gap-2 d-sm-flex mt-auto">
                 <Button
                   onClick={handleDownload}
                   disabled={!outputData}
                   className="flex-sm-grow-1"
                   variant="primary"
                 >
-                  ⬇️ Download
+                  <FaDownload className="me-2" /> Download
                 </Button>
                 <Button
                   onClick={handleCopyToClipboard}
@@ -183,7 +182,7 @@ export const HomePage: React.FC = () => {
                   className="flex-sm-grow-1"
                   variant="secondary"
                 >
-                  📋 Copy
+                  <FaCopy className="me-2" /> Copy
                 </Button>
               </div>
             </div>
