@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import { FileUpload } from '../components/FileUpload';
 import { FormatSelector } from '../components/FormatSelector';
 import { Button, ErrorAlert, SuccessAlert } from '../components/Common';
@@ -6,8 +7,21 @@ import type { SupportedFormat } from '../types';
 import { conversionService } from '../utils/api';
 import { useAppStore } from '../store/appStore';
 import { FaExchangeAlt, FaTrash, FaDownload, FaCopy } from 'react-icons/fa';
+import {
+  getPageSEO,
+  formatKeywords,
+  generateSoftwareApplicationSchema,
+  generateBreadcrumbSchema,
+  BASE_URL,
+} from '../utils/seo';
 
 export const HomePage: React.FC = () => {
+  const pageSEO = getPageSEO('home');
+  const softwareSchema = generateSoftwareApplicationSchema();
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: BASE_URL },
+    { name: 'File Converter', url: BASE_URL },
+  ]);
   const [sourceFormat, setSourceFormat] = useState<SupportedFormat>('csv');
   const [targetFormat, setTargetFormat] = useState<SupportedFormat>('json');
   const [inputData, setInputData] = useState('');
@@ -81,16 +95,48 @@ export const HomePage: React.FC = () => {
   };
 
   return (
-    <div className="container-lg py-5">
-      <div className="text-center mb-5">
-        <h1 className="display-4 fw-bold mb-3">Universal File Converter</h1>
-        <p className="lead text-muted">
-          Seamlessly convert between CSV, JSON, XML, YAML, and more.
-        </p>
-      </div>
+    <>
+      <Helmet>
+        <title>{pageSEO.title}</title>
+        <meta name="description" content={pageSEO.description} />
+        <meta name="keywords" content={formatKeywords(pageSEO.keywords)} />
+        <link rel="canonical" href={pageSEO.canonical} />
+        
+        {/* Open Graph / Facebook */}
+        <meta property="og:type" content={pageSEO.ogType} />
+        <meta property="og:url" content={pageSEO.canonical} />
+        <meta property="og:title" content={pageSEO.title} />
+        <meta property="og:description" content={pageSEO.description} />
+        <meta property="og:image" content={pageSEO.ogImage} />
+        
+        {/* Twitter */}
+        <meta name="twitter:card" content={pageSEO.twitterCard} />
+        <meta name="twitter:url" content={pageSEO.canonical} />
+        <meta name="twitter:title" content={pageSEO.title} />
+        <meta name="twitter:description" content={pageSEO.description} />
+        <meta name="twitter:image" content={pageSEO.ogImage} />
+        
+        {/* Structured Data - SoftwareApplication */}
+        <script type="application/ld+json">
+          {JSON.stringify(softwareSchema)}
+        </script>
+        
+        {/* Structured Data - Breadcrumb */}
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
+      </Helmet>
 
-      {error && <ErrorAlert message={error} onDismiss={() => setError('')} />}
-      {success && <SuccessAlert message={success} onDismiss={() => setSuccess('')} />}
+      <div className="container-lg py-5">
+        <div className="text-center mb-5">
+          <h1 className="display-4 fw-bold mb-3">Universal File Converter</h1>
+          <p className="lead text-muted">
+            Seamlessly convert between CSV, JSON, XML, YAML, and more.
+          </p>
+        </div>
+
+        {error && <ErrorAlert message={error} onDismiss={() => setError('')} />}
+        {success && <SuccessAlert message={success} onDismiss={() => setSuccess('')} />}
 
       <div className="row g-4">
         {/* Input Section */}
@@ -189,6 +235,7 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };

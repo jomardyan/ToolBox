@@ -1,14 +1,44 @@
 import React from 'react';
+import { Helmet } from 'react-helmet-async';
 import { useAppStore } from '../store/appStore';
 import { Button } from '../components/Common';
+import { getPageSEO, formatKeywords, generateBreadcrumbSchema, BASE_URL } from '../utils/seo';
 
 export const HistoryPage: React.FC = () => {
   const { history, clearHistory } = useAppStore();
+  const pageSEO = getPageSEO('history');
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: BASE_URL },
+    { name: 'History', url: `${BASE_URL}/history` },
+  ]);
 
   if (history.length === 0) {
     return (
-      <div className="container py-5">
-        <h2 className="display-6 fw-bold mb-5">Conversion History</h2>
+      <>
+        <Helmet>
+          <title>{pageSEO.title}</title>
+          <meta name="description" content={pageSEO.description} />
+          <meta name="keywords" content={formatKeywords(pageSEO.keywords)} />
+          <link rel="canonical" href={pageSEO.canonical} />
+          
+          <meta property="og:type" content={pageSEO.ogType} />
+          <meta property="og:url" content={pageSEO.canonical} />
+          <meta property="og:title" content={pageSEO.title} />
+          <meta property="og:description" content={pageSEO.description} />
+          
+          <meta name="twitter:card" content={pageSEO.twitterCard} />
+          <meta name="twitter:title" content={pageSEO.title} />
+          <meta name="twitter:description" content={pageSEO.description} />
+          
+          <meta name="robots" content="noindex, follow" />
+          
+          <script type="application/ld+json">
+            {JSON.stringify(breadcrumbSchema)}
+          </script>
+        </Helmet>
+        
+        <div className="container py-5">
+          <h2 className="display-6 fw-bold mb-5">Conversion History</h2>
         <div className="card text-center shadow-sm">
           <div className="card-body p-5">
             <p className="lead text-muted">No conversions yet</p>
@@ -17,14 +47,38 @@ export const HistoryPage: React.FC = () => {
             </p>
           </div>
         </div>
-      </div>
+        </div>
+      </>
     );
   }
 
   return (
-    <div className="container py-5">
-      <div className="d-flex justify-content-between align-items-center mb-4">
-        <h2 className="display-6 fw-bold">Conversion History</h2>
+    <>
+      <Helmet>
+        <title>{pageSEO.title}</title>
+        <meta name="description" content={pageSEO.description} />
+        <meta name="keywords" content={formatKeywords(pageSEO.keywords)} />
+        <link rel="canonical" href={pageSEO.canonical} />
+        
+        <meta property="og:type" content={pageSEO.ogType} />
+        <meta property="og:url" content={pageSEO.canonical} />
+        <meta property="og:title" content={pageSEO.title} />
+        <meta property="og:description" content={pageSEO.description} />
+        
+        <meta name="twitter:card" content={pageSEO.twitterCard} />
+        <meta name="twitter:title" content={pageSEO.title} />
+        <meta name="twitter:description" content={pageSEO.description} />
+        
+        <meta name="robots" content="noindex, follow" />
+        
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
+      </Helmet>
+      
+      <div className="container py-5">
+        <div className="d-flex justify-content-between align-items-center mb-4">
+          <h2 className="display-6 fw-bold">Conversion History</h2>
         <Button onClick={clearHistory} variant="danger" className="btn-sm">
           🗑️ Clear All
         </Button>
@@ -64,6 +118,7 @@ export const HistoryPage: React.FC = () => {
           </div>
         ))}
       </div>
-    </div>
+      </div>
+    </>
   );
 };

@@ -1,11 +1,19 @@
 import React, { useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 import BatchProcessor from '../components/BatchProcessor';
 import PresetsManager from '../components/PresetsManager';
 import type { ConversionPreset } from '../utils/api';
+import { getPageSEO, formatKeywords, generateBreadcrumbSchema, BASE_URL } from '../utils/seo';
 
 export const AdvancedFeaturesPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'batch' | 'presets'>('batch');
   const [selectedPreset, setSelectedPreset] = useState<ConversionPreset | null>(null);
+  
+  const pageSEO = getPageSEO('advanced');
+  const breadcrumbSchema = generateBreadcrumbSchema([
+    { name: 'Home', url: BASE_URL },
+    { name: 'Advanced Features', url: `${BASE_URL}/advanced` },
+  ]);
 
   const tabs = [
     { id: 'batch', label: 'Batch Processor', icon: '📦' },
@@ -13,10 +21,31 @@ export const AdvancedFeaturesPage: React.FC = () => {
   ] as const;
 
   return (
-    <div className="container-lg py-5">
-      {/* Header */}
-      <div className="mb-5">
-        <h1 className="display-4 fw-bold mb-2">Advanced Features</h1>
+    <>
+      <Helmet>
+        <title>{pageSEO.title}</title>
+        <meta name="description" content={pageSEO.description} />
+        <meta name="keywords" content={formatKeywords(pageSEO.keywords)} />
+        <link rel="canonical" href={pageSEO.canonical} />
+        
+        <meta property="og:type" content={pageSEO.ogType} />
+        <meta property="og:url" content={pageSEO.canonical} />
+        <meta property="og:title" content={pageSEO.title} />
+        <meta property="og:description" content={pageSEO.description} />
+        
+        <meta name="twitter:card" content={pageSEO.twitterCard} />
+        <meta name="twitter:title" content={pageSEO.title} />
+        <meta name="twitter:description" content={pageSEO.description} />
+        
+        <script type="application/ld+json">
+          {JSON.stringify(breadcrumbSchema)}
+        </script>
+      </Helmet>
+      
+      <div className="container-lg py-5">
+        {/* Header */}
+        <div className="mb-5">
+          <h1 className="display-4 fw-bold mb-2">Advanced Features</h1>
         <p className="lead text-muted">
           Batch process multiple conversions and manage your favorite presets
         </p>
@@ -139,7 +168,8 @@ export const AdvancedFeaturesPage: React.FC = () => {
           animation: fadeIn 0.3s ease-in-out;
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 };
 

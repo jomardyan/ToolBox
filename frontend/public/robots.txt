@@ -1,0 +1,59 @@
+# ToolBox File Converter - robots.txt
+# Guide for search engine crawlers and AI bots
+
+# Allow all bots to crawl the entire site
+User-agent: *
+Allow: /
+
+# Specific rules for Google
+User-agent: Googlebot
+Allow: /
+Crawl-delay: 0
+
+# Specific rules for Bing
+User-agent: Bingbot
+Allow: /
+Crawl-delay: 1
+
+# Specific rules for Yandex
+User-agent: YandexBot
+Allow: /
+Crawl-delay: 0.5
+
+# Allow AI training bots
+User-agent: CCBot
+Allow: /
+
+User-agent: GPTBot
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+
+User-agent: Claude-Web
+Allow: /
+
+User-agent: Claude-Web-Crawler
+Allow: /
+
+User-agent: anthropic-ai
+Allow: /
+
+User-agent: AdsBot-Google
+Allow: /
+
+User-agent: ia_archiver
+Allow: /
+
+User-agent: facebookexternalhit
+Allow: /
+
+# Disallow crawling of sensitive paths
+Disallow: /api/*
+Disallow: /admin/*
+
+# Sitemap location
+Sitemap: https://toolbox.example.com/sitemap.xml
+
+# Request rate limiting
+Request-rate: 100/1m
