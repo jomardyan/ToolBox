@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - LOG_LEVEL=debug
+    networks:
+      - csv-network
+    command: npm run dev
+
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend.dev
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:3000/api
+    depends_on:
+      - backend
+    networks:
+      - csv-network
+
+  # Optional: PostgreSQL for future database needs
+  # postgres:
+  #   image: postgres:15-alpine
+  #   ports:
+  #     - "5432:5432"
+  #   environment:
+  #     - POSTGRES_USER=csv_user
+  #     - POSTGRES_PASSWORD=csv_password
+  #     - POSTGRES_DB=csv_converter
+  #   volumes:
+  #     - postgres_data:/var/lib/postgresql/data
+  #   networks:
+  #     - csv-network
+  #
+  # volumes:
+  #   postgres_data:
+
+networks:
+  csv-network:
+    driver: bridge
