@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { useAppStore } from '../store/appStore';
 
 interface FileUploadProps {
   onFileSelect: (content: string) => void;
@@ -11,6 +12,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({
   accept = '*',
   maxSize = 100 * 1024 * 1024, // 100MB default
 }) => {
+  const { darkMode } = useAppStore();
   const [isDragging, setIsDragging] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -50,12 +52,15 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   return (
     <div
-      className={`border border-2 border-dashed rounded p-5 text-center transition-all ${
+      className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all duration-300 ${
         isDragging
-          ? 'border-primary bg-primary bg-opacity-10'
-          : 'border-secondary'
+          ? darkMode
+            ? 'border-blue-400 bg-blue-900/30 shadow-md'
+            : 'border-blue-500 bg-blue-50 shadow-md'
+          : darkMode
+            ? 'border-gray-600 hover:border-gray-500 hover:bg-gray-800/50'
+            : 'border-gray-300 hover:border-gray-400 hover:bg-gray-50'
       }`}
-      style={{ cursor: 'pointer' }}
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
       onDragOver={handleDrag}
@@ -67,12 +72,18 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         type="file"
         accept={accept}
         onChange={(e) => e.target.files && handleFile(e.target.files[0])}
-        className="d-none"
+        className="hidden"
       />
-      <div className="fs-1 mb-2">📁</div>
-      <h5 className="fw-semibold mb-1">Drag and drop your file</h5>
-      <p className="small text-muted mb-2">or click to browse</p>
-      <small className="text-muted d-block">
+      <div className="text-5xl mb-3">📁</div>
+      <h5 className={`font-semibold text-lg mb-2 ${
+        darkMode ? 'text-gray-100' : 'text-gray-800'
+      }`}>Drag and drop your file</h5>
+      <p className={`text-sm mb-2 ${
+        darkMode ? 'text-gray-400' : 'text-gray-500'
+      }`}>or click to browse your computer</p>
+      <small className={`block ${
+        darkMode ? 'text-gray-500' : 'text-gray-400'
+      }`}>
         Max size: {maxSize / 1024 / 1024}MB
       </small>
     </div>

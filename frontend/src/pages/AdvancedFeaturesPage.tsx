@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { FiZap, FiSave } from 'react-icons/fi';
+import { useAppStore } from '../store/appStore';
 import BatchProcessor from '../components/BatchProcessor';
 import PresetsManager from '../components/PresetsManager';
 import type { ConversionPreset } from '../utils/api';
 import { getPageSEO, formatKeywords, generateBreadcrumbSchema, BASE_URL } from '../utils/seo';
 
 export const AdvancedFeaturesPage: React.FC = () => {
+  const { darkMode } = useAppStore();
   const [activeTab, setActiveTab] = useState<'batch' | 'presets'>('batch');
   const [selectedPreset, setSelectedPreset] = useState<ConversionPreset | null>(null);
   
@@ -76,247 +78,227 @@ export const AdvancedFeaturesPage: React.FC = () => {
         </script>
       </Helmet>
 
-      <style>{`
-        .tab-pill {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.5rem;
-          padding: 0.75rem 1.5rem;
-          background: #f8f9fa;
-          border: 2px solid #e9ecef;
-          border-radius: 50px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          font-weight: 500;
-          color: #6c757d;
-        }
-        .tab-pill:hover {
-          background: #e9ecef;
-          border-color: #dee2e6;
-        }
-        .tab-pill.active {
-          background: linear-gradient(135deg, #0d6efd 0%, #0b5ed7 100%);
-          color: white;
-          border-color: #0b5ed7;
-          box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
-        }
-        .tab-pill svg {
-          width: 18px;
-          height: 18px;
-        }
-        
-        .content-fade {
-          animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(10px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
+      <div className={`min-h-screen py-12 px-4 sm:px-6 lg:px-8 ${
+        darkMode ? 'bg-gray-950 text-gray-100' : 'bg-white text-gray-900'
+      }`}>
+        <div className="max-w-7xl mx-auto">
+          {/* Header */}
+          <div className="mb-12">
+            <h1 className={`text-4xl sm:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-blue-500 bg-clip-text text-transparent ${
+              darkMode ? 'from-blue-400 to-blue-300' : ''
+            }`}>
+              Advanced Features
+            </h1>
+            <p className={`text-lg ${
+              darkMode ? 'text-gray-400' : 'text-gray-600'
+            }`}>
+              Unlock powerful tools for batch processing and workflow automation
+            </p>
+          </div>
 
-        .use-case-card {
-          padding: 1.5rem;
-          border-radius: 12px;
-          border: 2px solid #e9ecef;
-          transition: all 0.3s ease;
-          background: white;
-        }
-        .use-case-card:hover {
-          border-color: #0d6efd;
-          box-shadow: 0 4px 16px rgba(13, 110, 253, 0.1);
-          transform: translateY(-2px);
-        }
-        .use-case-card h5 {
-          color: #0d6efd;
-          font-weight: 600;
-          margin-bottom: 0.5rem;
-        }
-        .use-case-card p {
-          color: #6c757d;
-          margin: 0;
-          font-size: 0.95rem;
-        }
-
-        .benefit-card {
-          padding: 1.5rem;
-          border-radius: 12px;
-          background: linear-gradient(135deg, rgba(13, 110, 253, 0.05) 0%, rgba(13, 110, 253, 0.02) 100%);
-          border: 1px solid rgba(13, 110, 253, 0.1);
-          text-align: center;
-          transition: all 0.3s ease;
-        }
-        .benefit-card:hover {
-          border-color: #0d6efd;
-          background: linear-gradient(135deg, rgba(13, 110, 253, 0.1) 0%, rgba(13, 110, 253, 0.05) 100%);
-        }
-        .benefit-icon {
-          font-size: 2rem;
-          margin-bottom: 0.75rem;
-        }
-        .benefit-card h6 {
-          font-weight: 600;
-          color: #212529;
-          margin-bottom: 0.25rem;
-        }
-        .benefit-card p {
-          color: #6c757d;
-          margin: 0;
-          font-size: 0.9rem;
-        }
-
-        .tip-badge {
-          display: inline-flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem 1rem;
-          background: #e7f1ff;
-          border-left: 4px solid #0d6efd;
-          border-radius: 0 8px 8px 0;
-          margin: 0.5rem 0;
-          color: #0d6efd;
-          font-weight: 500;
-        }
-
-        .sticky-sidebar {
-          position: sticky;
-          top: 2rem;
-        }
-
-        @media (max-width: 768px) {
-          .sticky-sidebar {
-            position: static;
-            top: auto;
-            margin-top: 3rem;
-          }
-          .tab-pill {
-            display: flex;
-            width: 100%;
-            justify-content: center;
-          }
-        }
-      `}</style>
-
-      <div className="container-lg py-5">
-        {/* Header */}
-        <div className="mb-5">
-          <h1 className="display-4 fw-bold mb-2">Advanced Features</h1>
-          <p className="lead text-muted">
-            Unlock powerful tools for batch processing and workflow automation
-          </p>
-        </div>
-
-        {/* Tab Navigation */}
-        <div className="mb-5">
-          <div className="d-flex gap-3 flex-wrap">
+          {/* Tab Navigation */}
+          <div className="mb-8 flex gap-3 flex-wrap">
             {tabs.map(tab => {
               const Icon = tab.icon;
+              const isActive = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
-                  className={`tab-pill ${activeTab === tab.id ? 'active' : ''}`}
                   onClick={() => setActiveTab(tab.id)}
                   type="button"
+                  className={`inline-flex items-center gap-2 px-6 py-3 rounded-full font-medium transition-all duration-300 ${
+                    isActive
+                      ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white shadow-lg shadow-blue-500/30'
+                      : darkMode
+                      ? 'bg-gray-800 border-2 border-gray-700 text-gray-300 hover:border-gray-600 hover:bg-gray-700'
+                      : 'bg-gray-100 border-2 border-gray-300 text-gray-700 hover:bg-gray-200 hover:border-gray-400'
+                  }`}
                 >
-                  <Icon />
+                  <Icon className="w-5 h-5" />
                   <span>{tab.label}</span>
                 </button>
               );
             })}
           </div>
-        </div>
 
-        {/* Two Column Layout */}
-        <div className="row">
-          {/* Main Content */}
-          <div className="col-lg-8 col-12">
-            <div className="content-fade">
-              {activeTab === 'batch' && (
-                <div>
-                  <h3 className="mb-4">Batch Processor</h3>
-                  <BatchProcessor />
+          {/* Two Column Layout */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Main Content */}
+            <div className="lg:col-span-2">
+              <div className="transition-all duration-300">
+                {activeTab === 'batch' && (
+                  <div>
+                    <h3 className={`text-2xl font-bold mb-6 ${
+                      darkMode ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
+                      Batch Processor
+                    </h3>
+                    <BatchProcessor />
 
-                  {/* Use Cases */}
-                  <div className="mt-5">
-                    <h5 className="mb-3">When to Use Batch Processing</h5>
-                    <div className="row">
-                      {useCases.batch.map((useCase, idx) => (
-                        <div key={idx} className="col-md-6 mb-3">
-                          <div className="use-case-card">
-                            <h5>{useCase.title}</h5>
-                            <p>{useCase.desc}</p>
+                    {/* Use Cases */}
+                    <div className="mt-10">
+                      <h5 className={`text-xl font-semibold mb-4 ${
+                        darkMode ? 'text-gray-200' : 'text-gray-800'
+                      }`}>
+                        When to Use Batch Processing
+                      </h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {useCases.batch.map((useCase, idx) => (
+                          <div
+                            key={idx}
+                            className={`p-6 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-1 ${
+                              darkMode
+                                ? 'border-gray-700 bg-gray-800 hover:border-blue-500'
+                                : 'border-gray-300 bg-white hover:border-blue-500'
+                            }`}
+                          >
+                            <h5 className={`font-semibold mb-2 ${
+                              darkMode ? 'text-blue-400' : 'text-blue-600'
+                            }`}>
+                              {useCase.title}
+                            </h5>
+                            <p className={`text-sm ${
+                              darkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                              {useCase.desc}
+                            </p>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
 
-              {activeTab === 'presets' && (
-                <div>
-                  <h3 className="mb-4">Presets Manager</h3>
-                  <PresetsManager onPresetSelect={setSelectedPreset} />
+                {activeTab === 'presets' && (
+                  <div>
+                    <h3 className={`text-2xl font-bold mb-6 ${
+                      darkMode ? 'text-gray-100' : 'text-gray-900'
+                    }`}>
+                      Presets Manager
+                    </h3>
+                    <PresetsManager onPresetSelect={setSelectedPreset} />
 
-                  {/* Use Cases */}
-                  <div className="mt-5">
-                    <h5 className="mb-3">When to Use Presets</h5>
-                    <div className="row">
-                      {useCases.presets.map((useCase, idx) => (
-                        <div key={idx} className="col-md-6 mb-3">
-                          <div className="use-case-card">
-                            <h5>{useCase.title}</h5>
-                            <p>{useCase.desc}</p>
+                    {/* Use Cases */}
+                    <div className="mt-10">
+                      <h5 className={`text-xl font-semibold mb-4 ${
+                        darkMode ? 'text-gray-200' : 'text-gray-800'
+                      }`}>
+                        When to Use Presets
+                      </h5>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        {useCases.presets.map((useCase, idx) => (
+                          <div
+                            key={idx}
+                            className={`p-6 rounded-lg border-2 transition-all duration-300 cursor-pointer hover:shadow-lg hover:-translate-y-1 ${
+                              darkMode
+                                ? 'border-gray-700 bg-gray-800 hover:border-blue-500'
+                                : 'border-gray-300 bg-white hover:border-blue-500'
+                            }`}
+                          >
+                            <h5 className={`font-semibold mb-2 ${
+                              darkMode ? 'text-blue-400' : 'text-blue-600'
+                            }`}>
+                              {useCase.title}
+                            </h5>
+                            <p className={`text-sm ${
+                              darkMode ? 'text-gray-400' : 'text-gray-600'
+                            }`}>
+                              {useCase.desc}
+                            </p>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
 
-          {/* Sticky Sidebar */}
-          <div className="col-lg-4 col-12">
-            <div className="sticky-sidebar">
-              {/* Tips Section */}
-              <div className="mb-4">
-                <h5 className="mb-3">💡 Quick Tips</h5>
-                {tips[activeTab].map((tip, idx) => (
-                  <div key={idx} className="tip-badge">
-                    <span>✓</span>
-                    <span>{tip}</span>
+            {/* Sticky Sidebar */}
+            <div className="lg:col-span-1">
+              <div className="sticky top-24 space-y-6">
+                {/* Tips Section */}
+                <div>
+                  <h5 className={`text-lg font-semibold mb-4 ${
+                    darkMode ? 'text-gray-200' : 'text-gray-800'
+                  }`}>
+                    💡 Quick Tips
+                  </h5>
+                  <div className="space-y-2">
+                    {tips[activeTab].map((tip, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex items-start gap-3 p-3 rounded border-l-4 ${
+                          darkMode
+                            ? 'bg-blue-900/20 border-blue-500 text-blue-300'
+                            : 'bg-blue-50 border-blue-500 text-blue-700'
+                        }`}
+                      >
+                        <span className="flex-shrink-0 mt-0.5">✓</span>
+                        <span className="text-sm">{tip}</span>
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-
-              {/* Benefits */}
-              <div>
-                <h5 className="mb-3">Key Benefits</h5>
-                {benefits.map((benefit, idx) => (
-                  <div key={idx} className="benefit-card">
-                    <div className="benefit-icon">{benefit.icon}</div>
-                    <h6>{benefit.label}</h6>
-                    <p>{benefit.desc}</p>
-                  </div>
-                ))}
-              </div>
-
-              {/* Selected Preset Info */}
-              {selectedPreset && (
-                <div className="mt-4 p-3 bg-info bg-opacity-10 rounded-3 border border-info border-opacity-25">
-                  <h6 className="text-info mb-2">✓ Preset Loaded</h6>
-                  <p className="mb-1 small fw-medium">{selectedPreset.name}</p>
-                  <small className="text-muted d-block">
-                    {selectedPreset.sourceFormat.toUpperCase()} → {selectedPreset.targetFormat.toUpperCase()}
-                  </small>
                 </div>
-              )}
+
+                {/* Benefits */}
+                <div>
+                  <h5 className={`text-lg font-semibold mb-4 ${
+                    darkMode ? 'text-gray-200' : 'text-gray-800'
+                  }`}>
+                    Key Benefits
+                  </h5>
+                  <div className="space-y-3">
+                    {benefits.map((benefit, idx) => (
+                      <div
+                        key={idx}
+                        className={`p-4 rounded-lg text-center transition-all duration-300 ${
+                          darkMode
+                            ? 'bg-gradient-to-br from-blue-900/20 to-blue-800/10 border border-blue-700/30 hover:border-blue-500/50'
+                            : 'bg-gradient-to-br from-blue-50 to-blue-100/50 border border-blue-200 hover:border-blue-400'
+                        }`}
+                      >
+                        <div className="text-2xl mb-2">{benefit.icon}</div>
+                        <h6 className={`font-semibold mb-1 ${
+                          darkMode ? 'text-gray-100' : 'text-gray-900'
+                        }`}>
+                          {benefit.label}
+                        </h6>
+                        <p className={`text-xs ${
+                          darkMode ? 'text-gray-400' : 'text-gray-600'
+                        }`}>
+                          {benefit.desc}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Selected Preset Info */}
+                {selectedPreset && (
+                  <div className={`p-4 rounded-lg border-2 transition-all duration-300 ${
+                    darkMode
+                      ? 'bg-cyan-900/20 border-cyan-500/50 text-cyan-300'
+                      : 'bg-cyan-50 border-cyan-400 text-cyan-700'
+                  }`}>
+                    <h6 className={`font-semibold mb-2 ${
+                      darkMode ? 'text-cyan-400' : 'text-cyan-600'
+                    }`}>
+                      ✓ Preset Loaded
+                    </h6>
+                    <p className={`mb-1 font-medium text-sm ${
+                      darkMode ? 'text-cyan-200' : 'text-cyan-800'
+                    }`}>
+                      {selectedPreset.name}
+                    </p>
+                    <p className={`text-xs ${
+                      darkMode ? 'text-cyan-300/70' : 'text-cyan-600/70'
+                    }`}>
+                      {selectedPreset.sourceFormat.toUpperCase()} → {selectedPreset.targetFormat.toUpperCase()}
+                    </p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

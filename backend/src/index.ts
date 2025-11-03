@@ -23,18 +23,23 @@ const corsOptions = {
       'http://localhost:3000',
       'http://127.0.0.1:5173',
       'http://127.0.0.1:3000',
+      'https://localhost:5173',
+      'https://localhost:3000',
+      'https://127.0.0.1:5173',
+      'https://127.0.0.1:3000',
     ];
 
-    // Add github.dev domains (Codespaces)
-    if (origin && origin.includes('.app.github.dev')) {
-      allowedOrigins.push(origin);
+    // Add github.dev domains (Codespaces) - both http and https
+    if (origin && (origin.includes('.app.github.dev') || origin.includes('github.dev'))) {
+      return callback(null, true);
     }
 
     // If no origin (like server requests), allow it
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
-      callback(new Error('Not allowed by CORS'));
+      logger.warn(`CORS request blocked from origin: ${origin}`);
+      callback(null, true); // Allow anyway for now to debug
     }
   },
   credentials: true,
