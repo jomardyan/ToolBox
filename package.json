@@ -1,0 +1,34 @@
+{
+  "name": "csv-converter",
+  "version": "1.0.0",
+  "description": "Modern CSV conversion web application with support for multiple formats",
+  "private": true,
+  "scripts": {
+    "dev:all": "./dev.sh",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
+    "build:all": "cd backend && npm run build && cd ../frontend && npm run build",
+    "test:backend": "cd backend && npm test",
+    "lint:backend": "cd backend && npm run lint",
+    "docker:up": "docker-compose up --build",
+    "docker:down": "docker-compose down",
+    "clean": "rm -rf backend/dist backend/node_modules frontend/dist frontend/node_modules logs/",
+    "clean:logs": "rm -rf logs/"
+  },
+  "keywords": [
+    "csv",
+    "converter",
+    "json",
+    "xml",
+    "yaml",
+    "html",
+    "data-processing"
+  ],
+  "author": "",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0",
+    "npm": ">=9.0.0"
+  }
+}

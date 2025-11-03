@@ -8,13 +8,15 @@ import './App.css';
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-white dark:bg-gray-900">
+      <div className="d-flex flex-column min-vh-100">
         <Header />
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/history" element={<HistoryPage />} />
-          <Route path="/advanced" element={<AdvancedFeaturesPage />} />
-        </Routes>
+        <main className="flex-grow-1 bg-light py-5">
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/history" element={<HistoryPage />} />
+            <Route path="/advanced" element={<AdvancedFeaturesPage />} />
+          </Routes>
+        </main>
       </div>
     </BrowserRouter>
   );

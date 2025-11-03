@@ -50,11 +50,12 @@ export const FileUpload: React.FC<FileUploadProps> = ({
 
   return (
     <div
-      className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+      className={`border border-2 border-dashed rounded p-5 text-center transition-all ${
         isDragging
-          ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-          : 'border-gray-300 dark:border-gray-600 hover:border-gray-400 dark:hover:border-gray-500'
+          ? 'border-primary bg-primary bg-opacity-10'
+          : 'border-secondary'
       }`}
+      style={{ cursor: 'pointer' }}
       onDragEnter={handleDrag}
       onDragLeave={handleDrag}
       onDragOver={handleDrag}
@@ -66,14 +67,14 @@ export const FileUpload: React.FC<FileUploadProps> = ({
         type="file"
         accept={accept}
         onChange={(e) => e.target.files && handleFile(e.target.files[0])}
-        className="hidden"
+        className="d-none"
       />
-      <div className="text-4xl mb-2">📁</div>
-      <h3 className="text-lg font-semibold mb-1">Drag and drop your file</h3>
-      <p className="text-sm text-gray-600 dark:text-gray-400">or click to browse</p>
-      <p className="text-xs text-gray-500 dark:text-gray-500 mt-2">
+      <div className="fs-1 mb-2">📁</div>
+      <h5 className="fw-semibold mb-1">Drag and drop your file</h5>
+      <p className="small text-muted mb-2">or click to browse</p>
+      <small className="text-muted d-block">
         Max size: {maxSize / 1024 / 1024}MB
-      </p>
+      </small>
     </div>
   );
 };

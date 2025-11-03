@@ -14,43 +14,48 @@ export const Header: React.FC = () => {
   }, [darkMode]);
 
   return (
-    <header className="bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 sticky top-0 z-40">
-      <div className="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="text-2xl">📊</div>
+    <header className={`navbar navbar-expand-lg navbar-sticky ${darkMode ? 'navbar-dark bg-dark' : 'navbar-light bg-white border-bottom'}`}>
+      <div className="container-fluid">
+        <Link to="/" className="navbar-brand d-flex align-items-center gap-2">
+          <span className="fs-3">📊</span>
           <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">CSV Converter</h1>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Convert any format</p>
+            <div className="fw-bold">CSV Converter</div>
+            <small className={darkMode ? 'text-muted' : 'text-muted'}>Convert any format</small>
           </div>
         </Link>
 
-        <nav className="flex items-center gap-6">
-          <Link
-            to="/"
-            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            Home
-          </Link>
-          <Link
-            to="/history"
-            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            History
-          </Link>
-          <Link
-            to="/advanced"
-            className="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            Advanced
-          </Link>
-          <button
-            onClick={toggleDarkMode}
-            className="p-2 rounded-lg bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
-            title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-          >
-            {darkMode ? '☀️' : '🌙'}
-          </button>
-        </nav>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <nav className="navbar-nav ms-auto gap-3 align-items-center">
+            <Link to="/" className="nav-link">
+              Home
+            </Link>
+            <Link to="/history" className="nav-link">
+              History
+            </Link>
+            <Link to="/advanced" className="nav-link">
+              Advanced
+            </Link>
+            <button
+              onClick={toggleDarkMode}
+              className={`btn btn-sm ${darkMode ? 'btn-light' : 'btn-dark'}`}
+              title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+            >
+              {darkMode ? '☀️' : '🌙'}
+            </button>
+          </nav>
+        </div>
       </div>
     </header>
   );
