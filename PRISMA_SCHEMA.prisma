@@ -1,0 +1,357 @@
+// prisma/schema.prisma
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ===== Enums =====
+
+enum UserRole {
+  ADMIN
+  USER
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum PlanType {
+  SUBSCRIPTION
+  PAY_AS_YOU_GO
+  HYBRID
+}
+
+enum PlanStatus {
+  ACTIVE
+  ARCHIVED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  PAST_DUE
+  CANCELLED
+  PENDING
+}
+
+enum BillingStatus {
+  PAID
+  PENDING
+  FAILED
+}
+
+enum PaymentMethodType {
+  CARD
+  BANK
+}
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  SUSPEND
+  REACTIVATE
+  LOGIN
+  LOGOUT
+  PAYMENT_PROCESSED
+  SUBSCRIPTION_CREATED
+  SUBSCRIPTION_CANCELLED
+  API_KEY_CREATED
+  API_KEY_REVOKED
+}
+
+// ===== Models =====
+
+model User {
+  id                String          @id @default(uuid())
+  email             String          @unique
+  passwordHash      String
+  firstName         String
+  lastName          String
+  companyName       String?
+  avatar            String?
+  phone             String?
+  address           String?
+  city              String?
+  state             String?
+  postalCode        String?
+  country           String?
+  status            UserStatus      @default(ACTIVE)
+  role              UserRole        @default(USER)
+  emailVerified     Boolean         @default(false)
+  emailVerificationToken String?
+  emailVerificationExpires DateTime?
+  passwordResetToken String?
+  passwordResetExpires DateTime?
+  twoFactorEnabled  Boolean         @default(false)
+  twoFactorSecret   String?
+  lastLoginAt       DateTime?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  organizations     Organization[]
+  subscriptions     Subscription[]
+  apiKeys           ApiKey[]
+  usageLogs         UsageLog[]
+  billingRecords    BillingRecord[]
+  paymentMethods    PaymentMethod[]
+  auditLogs         AuditLog[]
+  sessions          Session[]
+  notifications     Notification[]
+
+  @@index([email])
+  @@index([status])
+  @@index([role])
+}
+
+model Organization {
+  id                String          @id @default(uuid())
+  ownerId           String
+  owner             User            @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  name              String
+  slug              String          @unique
+  description       String?
+  avatar            String?
+  website           String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  members           OrganizationMember[]
+
+  @@index([ownerId])
+  @@index([slug])
+}
+
+model OrganizationMember {
+  id                String          @id @default(uuid())
+  organizationId    String
+  organization      Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId            String
+  role              String          @default("member")
+  joinedAt          DateTime        @default(now())
+
+  @@unique([organizationId, userId])
+  @@index([organizationId])
+}
+
+model Session {
+  id                String          @id @default(cuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  token             String          @unique
+  refreshToken      String          @unique
+  expiresAt         DateTime
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model Plan {
+  id                String          @id @default(uuid())
+  name              String
+  description       String?
+  type              PlanType        @default(SUBSCRIPTION)
+  price             Float           @default(0)
+  currency          String          @default("usd")
+  billingPeriod     String?         @default("monthly") // monthly, annual, per-request
+  stripeProductId   String?         @unique
+  stripePriceId     String?         @unique
+  features          Json            @default("{}")
+  rateLimit         Int             @default(1000) // requests per minute
+  monthlyLimit      Int?            // null = unlimited
+  maxApiKeys        Int             @default(5)
+  maxOrganizations  Int             @default(1)
+  supportLevel      String          @default("community")
+  status            PlanStatus      @default(ACTIVE)
+  displayOrder      Int             @default(0)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  subscriptions     Subscription[]
+
+  @@index([type])
+  @@index([status])
+}
+
+model Subscription {
+  id                String          @id @default(uuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId            String
+  plan              Plan            @relation(fields: [planId], references: [id])
+  stripeSubscriptionId String?      @unique
+  billingCycleStart DateTime
+  billingCycleEnd   DateTime
+  status            SubscriptionStatus @default(ACTIVE)
+  autoRenew         Boolean         @default(true)
+  cancellationDate  DateTime?
+  cancellationReason String?
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  billingRecords    BillingRecord[]
+
+  @@index([userId])
+  @@index([planId])
+  @@index([status])
+  @@index([billingCycleEnd])
+}
+
+model ApiKey {
+  id                String          @id @default(uuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name              String
+  keyHash           String          @unique // hashed key
+  keyPrefix         String          @unique // for display: "sk_live_xxx"
+  lastUsedAt        DateTime?
+  lastUsedIp        String?
+  createdAt         DateTime        @default(now())
+  expiresAt         DateTime?
+  revokedAt         DateTime?
+  updatedAt         DateTime        @updatedAt
+
+  // Relations
+  usageLogs         UsageLog[]
+
+  @@index([userId])
+  @@index([revokedAt])
+  @@index([keyPrefix])
+}
+
+model UsageLog {
+  id                BigInt          @id @default(autoincrement())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  apiKeyId          String?
+  apiKey            ApiKey?         @relation(fields: [apiKeyId], references: [id], onDelete: SetNull)
+  endpoint          String
+  method            String
+  statusCode        Int
+  responseTimeMs    Int
+  tokensUsed        Int             @default(1)
+  cost              Float           @default(0)
+  ipAddress         String?
+  userAgent         String?
+  errorMessage      String?
+  timestamp         DateTime        @default(now())
+
+  @@index([userId])
+  @@index([apiKeyId])
+  @@index([timestamp])
+  @@index([endpoint])
+}
+
+model BillingRecord {
+  id                String          @id @default(uuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionId    String?
+  subscription      Subscription?   @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  invoiceId         String          @unique
+  stripeInvoiceId   String?         @unique
+  amount            Float
+  currency          String          @default("usd")
+  status            BillingStatus   @default(PENDING)
+  periodStart       DateTime
+  periodEnd         DateTime
+  description       String?
+  lineItems         Json            @default("[]")
+  createdAt         DateTime        @default(now())
+  paidAt            DateTime?
+  failureReason     String?
+  updatedAt         DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([periodEnd])
+}
+
+model PaymentMethod {
+  id                String          @id @default(uuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripePaymentMethodId String      @unique
+  type              PaymentMethodType
+  lastFour          String
+  brand             String?
+  expiryMonth       Int?
+  expiryYear        Int?
+  isDefault         Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@index([userId])
+}
+
+model ApiEndpoint {
+  id                String          @id @default(uuid())
+  name              String
+  description       String?
+  path              String
+  method            String
+  ratePerMinute     Int             @default(60)
+  isPublic          Boolean         @default(false)
+  requiresAuth      Boolean         @default(true)
+  createdAt         DateTime        @default(now())
+  updatedAt         DateTime        @updatedAt
+
+  @@unique([path, method])
+}
+
+model AuditLog {
+  id                String          @id @default(uuid())
+  userId            String?
+  user              User?           @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action            AuditAction
+  resourceType      String
+  resourceId        String?
+  changes           Json?
+  ipAddress         String?
+  userAgent         String?
+  timestamp         DateTime        @default(now())
+
+  @@index([userId])
+  @@index([timestamp])
+  @@index([action])
+}
+
+model Notification {
+  id                String          @id @default(uuid())
+  userId            String
+  user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type              String
+  title             String
+  message           String
+  data              Json?
+  read              Boolean         @default(false)
+  createdAt         DateTime        @default(now())
+  readAt            DateTime?
+
+  @@index([userId])
+  @@index([read])
+}
+
+model StripeWebhookEvent {
+  id                String          @id @default(uuid())
+  eventId           String          @unique
+  type              String
+  data              Json
+  processed         Boolean         @default(false)
+  processedAt       DateTime?
+  createdAt         DateTime        @default(now())
+
+  @@index([type])
+  @@index([processed])
+}

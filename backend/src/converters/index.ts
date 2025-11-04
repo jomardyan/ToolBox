@@ -135,38 +135,58 @@ export const htmlToCSV = (htmlData: string): string => {
   
   // Use regex to find table rows
   const trRegex = /<tr[^>]*>([\s\S]*?)<\/tr>/gi;
+  const thRegex = /<th[^>]*>([\s\S]*?)<\/th>/gi;
   const tdRegex = /<td[^>]*>([\s\S]*?)<\/td>/gi;
   
-  let isHeader = true;
   let headers: string[] = [];
+  let isFirstRow = true;
   
   let trMatch;
   while ((trMatch = trRegex.exec(htmlData)) !== null) {
-    const row: Record<string, any> = {};
-    const tdMatches = [];
-    let tdMatch;
+    const rowContent = trMatch[1];
     
-    // Reset regex
-    tdRegex.lastIndex = 0;
-    while ((tdMatch = tdRegex.exec(trMatch[1])) !== null) {
-      tdMatches.push(tdMatch[1]);
+    // Check if this row contains <th> (header row)
+    let cellMatches = [];
+    
+    // Try to extract <th> cells
+    let thMatch;
+    while ((thMatch = thRegex.exec(rowContent)) !== null) {
+      cellMatches.push(thMatch[1]);
     }
     
-    tdMatches.forEach((content, index) => {
-      const cleanContent = content.replace(/<[^>]+>/g, '').trim();
-      
-      if (isHeader) {
-        headers.push(cleanContent);
-      } else {
-        const header = headers[index] || `column_${index}`;
-        row[header] = cleanContent;
+    // If no <th> found, extract <td> cells
+    if (cellMatches.length === 0) {
+      let tdMatch;
+      while ((tdMatch = tdRegex.exec(rowContent)) !== null) {
+        cellMatches.push(tdMatch[1]);
       }
-    });
-    
-    if (!isHeader && Object.keys(row).length > 0) {
-      rows.push(row);
     }
-    isHeader = false;
+    
+    if (cellMatches.length === 0) {
+      continue;
+    }
+    
+    // Extract clean text from cells
+    const cleanCells = cellMatches.map((content) => 
+      content.replace(/<[^>]+>/g, '').trim()
+    );
+    
+    // First row with cells is the header if it's the first row
+    if (isFirstRow && headers.length === 0) {
+      headers = cleanCells;
+      isFirstRow = false;
+    } else if (headers.length > 0) {
+      // Subsequent rows are data
+      const row: Record<string, any> = {};
+      cleanCells.forEach((content, index) => {
+        const header = headers[index] || `column_${index}`;
+        row[header] = content;
+      });
+      
+      if (Object.keys(row).length > 0) {
+        rows.push(row);
+      }
+    }
   }
   
   return generateCSV(rows, headers);

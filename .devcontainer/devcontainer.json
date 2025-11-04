@@ -10,11 +10,15 @@
   "portsAttributes": {
     "3000": {
       "label": "Backend API",
-      "onAutoForward": "notify"
+      "onAutoForward": "notify",
+      "visibility": "public",
+      "protocol": "https"
     },
     "5173": {
       "label": "Frontend",
-      "onAutoForward": "notify"
+      "onAutoForward": "notify",
+      "visibility": "public",
+      "protocol": "https"
     }
   },
   "postCreateCommand": "npm install -g npm@latest",

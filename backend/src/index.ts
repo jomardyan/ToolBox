@@ -12,44 +12,68 @@ import { swaggerSpec } from './swagger/swaggerConfig';
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
 
+// Trust proxy - important for GitHub Codespaces and other reverse proxies
+app.set('trust proxy', true);
+
 // Rate limiters
 const generalLimiter = rateLimit(RATE_LIMIT_CONFIG.normal);
 const strictLimiter = rateLimit(RATE_LIMIT_CONFIG.strict);
 const batchLimiter = rateLimit(RATE_LIMIT_CONFIG.batch);
 
-// Middleware
-const corsOptions = {
-  origin: function(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
-    const allowedOrigins = [
-      'http://localhost:5173',
-      'http://localhost:3000',
-      'http://127.0.0.1:5173',
-      'http://127.0.0.1:3000',
-      'https://localhost:5173',
-      'https://localhost:3000',
-      'https://127.0.0.1:5173',
-      'https://127.0.0.1:3000',
-    ];
+// CORS Configuration - Completely permissive in development
+if (process.env.NODE_ENV === 'production') {
+  // Production: Restricted CORS
+  const corsOptions = {
+    origin: function(origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) {
+      const allowedOrigins = [
+        'http://localhost:5173',
+        'http://localhost:3000',
+        'http://127.0.0.1:5173',
+        'http://127.0.0.1:3000',
+        'https://localhost:5173',
+        'https://localhost:3000',
+        'https://127.0.0.1:5173',
+        'https://127.0.0.1:3000',
+      ];
 
-    // Add github.dev domains (Codespaces) - both http and https
-    if (origin && (origin.includes('.app.github.dev') || origin.includes('github.dev'))) {
-      return callback(null, true);
+      // Allow GitHub Codespaces domains
+      if (origin && origin.includes('.app.github.dev')) {
+        return callback(null, true);
+      }
+
+      // If no origin (like server requests), allow it
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        logger.warn(`CORS request blocked from origin: ${origin}`);
+        callback(new Error('Not allowed by CORS'));
+      }
+    },
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    exposedHeaders: ['Content-Type'],
+    optionsSuccessStatus: 200,
+  };
+  
+  app.use(cors(corsOptions));
+} else {
+  // Development: CORS completely disabled - accept everything
+  app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS, PATCH');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Max-Age', '86400'); // 24 hours
+    
+    // Handle preflight
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(200);
     }
-
-    // If no origin (like server requests), allow it
-    if (!origin || allowedOrigins.includes(origin)) {
-      callback(null, true);
-    } else {
-      logger.warn(`CORS request blocked from origin: ${origin}`);
-      callback(null, true); // Allow anyway for now to debug
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-};
-
-app.use(cors(corsOptions));
+    
+    next();
+  });
+}
 
 app.use(express.json({ limit: '50mb' }));
 app.use(express.text({ limit: '50mb' }));
@@ -59,15 +83,19 @@ app.disable('x-powered-by');
 
 // Request logging
 app.use((req, res, next) => {
-  logger.info(`${req.method} ${req.path}`);
+  logger.info(`${req.method} ${req.path} - Origin: ${req.headers.origin || 'none'}`);
   next();
 });
 
-// Rate limiting on specific endpoints
-app.use('/api/convert', generalLimiter);
-app.use('/api/extract', generalLimiter);
-app.use('/api/batch-convert', batchLimiter);
-app.use('/api/presets', generalLimiter);
+// Rate limiting on specific endpoints (disabled in development for easier debugging)
+if (process.env.NODE_ENV === 'production') {
+  app.use('/api/convert', generalLimiter);
+  app.use('/api/extract', generalLimiter);
+  app.use('/api/batch-convert', batchLimiter);
+  app.use('/api/presets', generalLimiter);
+} else {
+  logger.info('Rate limiting disabled in development mode');
+}
 
 // Swagger documentation
 app.use('/api-docs', swaggerUi.serve);

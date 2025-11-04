@@ -23,25 +23,82 @@ describe('Validation Utilities', () => {
   });
 
   describe('isValidFormat', () => {
-    test('should accept all valid formats', () => {
-      const validFormats = ['csv', 'json', 'xml', 'yaml', 'html', 'tsv', 'kml', 'txt'];
+    test('should accept all 17 valid formats', () => {
+      const validFormats = [
+        'csv', 'json', 'xml', 'yaml', 'html', 'table', 'tsv', 'kml', 
+        'txt', 'markdown', 'jsonl', 'ndjson', 'lines', 'ics', 'toml', 
+        'excel', 'sql'
+      ];
       validFormats.forEach(fmt => {
         expect(isValidFormat(fmt)).toBe(true);
       });
     });
 
+    test('should accept all format aliases', () => {
+      // Test HTML/Table alias
+      expect(isValidFormat('html')).toBe(true);
+      expect(isValidFormat('table')).toBe(true);
+      
+      // Test JSONL/NDJSON/Lines aliases
+      expect(isValidFormat('jsonl')).toBe(true);
+      expect(isValidFormat('ndjson')).toBe(true);
+      expect(isValidFormat('lines')).toBe(true);
+    });
+
     test('should be case-insensitive', () => {
       expect(isValidFormat('CSV')).toBe(true);
       expect(isValidFormat('Json')).toBe(true);
+      expect(isValidFormat('YAML')).toBe(true);
+      expect(isValidFormat('Html')).toBe(true);
+      expect(isValidFormat('SQL')).toBe(true);
+      expect(isValidFormat('MARKDOWN')).toBe(true);
     });
 
     test('should reject invalid formats', () => {
       expect(isValidFormat('exe')).toBe(false);
       expect(isValidFormat('xyz')).toBe(false);
+      expect(isValidFormat('pdf')).toBe(false);
+      expect(isValidFormat('doc')).toBe(false);
+      expect(isValidFormat('random')).toBe(false);
     });
 
     test('should reject non-string input', () => {
       expect(isValidFormat(null as any)).toBe(false);
+      expect(isValidFormat(undefined as any)).toBe(false);
+      expect(isValidFormat(123 as any)).toBe(false);
+      expect(isValidFormat({} as any)).toBe(false);
+      expect(isValidFormat([] as any)).toBe(false);
+    });
+
+    test('should reject empty string', () => {
+      expect(isValidFormat('')).toBe(false);
+    });
+
+    test('should validate all backend-supported formats', () => {
+      // Core formats
+      expect(isValidFormat('csv')).toBe(true);
+      expect(isValidFormat('json')).toBe(true);
+      expect(isValidFormat('xml')).toBe(true);
+      expect(isValidFormat('yaml')).toBe(true);
+      
+      // Table formats
+      expect(isValidFormat('html')).toBe(true);
+      expect(isValidFormat('table')).toBe(true);
+      expect(isValidFormat('tsv')).toBe(true);
+      expect(isValidFormat('markdown')).toBe(true);
+      
+      // Data formats
+      expect(isValidFormat('jsonl')).toBe(true);
+      expect(isValidFormat('ndjson')).toBe(true);
+      expect(isValidFormat('lines')).toBe(true);
+      expect(isValidFormat('toml')).toBe(true);
+      
+      // Specialized formats
+      expect(isValidFormat('kml')).toBe(true);
+      expect(isValidFormat('ics')).toBe(true);
+      expect(isValidFormat('sql')).toBe(true);
+      expect(isValidFormat('excel')).toBe(true);
+      expect(isValidFormat('txt')).toBe(true);
     });
   });
 
