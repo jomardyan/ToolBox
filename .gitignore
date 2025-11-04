@@ -48,6 +48,10 @@ tmp/
 temp/
 *.tmp
 
+# Large binary files
+*.deb
+google-chrome-stable_current_amd64.deb
+
 # Build artifacts
 *.tgz
 dist-*
