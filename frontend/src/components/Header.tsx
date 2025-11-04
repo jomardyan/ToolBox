@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAppStore } from '../store/appStore';
+import { useAuthStore } from '../store/authStore';
 
 export const Header: React.FC = () => {
   const { darkMode, toggleDarkMode } = useAppStore();
+  const { isAuthenticated, logout } = useAuthStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
   React.useEffect(() => {
@@ -61,18 +63,65 @@ export const Header: React.FC = () => {
             >
               Advanced
             </Link>
-            <button
-              onClick={toggleDarkMode}
-              className={`p-2 rounded-lg transition-colors ${
-                darkMode 
-                  ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400' 
-                  : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
-              }`}
-              title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-              aria-label="Toggle dark mode"
-            >
-              {darkMode ? '☀️' : '🌙'}
-            </button>
+            
+            {/* Auth Buttons */}
+            <div className="flex items-center gap-4 pl-4 border-l" style={{ borderColor: darkMode ? '#374151' : '#e5e7eb' }}>
+              <button
+                onClick={toggleDarkMode}
+                className={`p-2 rounded-lg transition-colors ${
+                  darkMode 
+                    ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400' 
+                    : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
+                }`}
+                title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                aria-label="Toggle dark mode"
+              >
+                {darkMode ? '☀️' : '🌙'}
+              </button>
+              
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="px-4 py-2 rounded-lg font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700"
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      darkMode
+                        ? 'text-gray-300 hover:text-red-400'
+                        : 'text-gray-700 hover:text-red-600'
+                    }`}
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                      darkMode
+                        ? 'text-gray-300 hover:text-blue-400'
+                        : 'text-gray-700 hover:text-blue-600'
+                    }`}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="px-4 py-2 rounded-lg font-medium transition-colors bg-blue-600 text-white hover:bg-blue-700"
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
+            </div>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -137,6 +186,55 @@ export const Header: React.FC = () => {
             >
               Advanced
             </Link>
+            
+            {/* Mobile Auth Buttons */}
+            <div className="pt-4 mt-4 border-t" style={{ borderColor: darkMode ? '#374151' : '#e5e7eb' }}>
+              {isAuthenticated ? (
+                <>
+                  <Link
+                    to="/dashboard"
+                    className="block py-2 px-4 mb-2 rounded-lg font-medium text-center bg-blue-600 text-white hover:bg-blue-700"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setIsMenuOpen(false);
+                    }}
+                    className={`block w-full py-2 px-4 text-left rounded-lg font-medium transition-colors ${
+                      darkMode
+                        ? 'text-gray-300 hover:text-red-400'
+                        : 'text-gray-700 hover:text-red-600'
+                    }`}
+                  >
+                    Logout
+                  </button>
+                </>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className={`block py-2 px-4 mb-2 rounded-lg font-medium text-center transition-colors ${
+                      darkMode
+                        ? 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block py-2 px-4 rounded-lg font-medium text-center bg-blue-600 text-white hover:bg-blue-700"
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    Sign Up
+                  </Link>
+                </>
+              )}
+            </div>
           </nav>
         )}
       </div>

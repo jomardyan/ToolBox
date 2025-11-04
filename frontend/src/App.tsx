@@ -1,27 +1,37 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import LoginPage from './pages/LoginPage';
-import RegisterPage from './pages/RegisterPage';
-import DashboardLayout from './components/DashboardLayout';
-import DashboardPage from './pages/DashboardPage';
-import ApiKeysPage from './pages/ApiKeysPage';
-import UsagePage from './pages/UsagePage';
-import SubscriptionPage from './pages/SubscriptionPage';
-import BillingPage from './pages/BillingPage';
-import AdminLayout from './components/AdminLayout';
-import AdminUsers from './components/AdminUsers';
-import AdminPlans from './components/AdminPlans';
-import AdminAnalytics from './components/AdminAnalytics';
-import ProtectedRoute from './components/ProtectedRoute';
+import { Header } from './components/Header';
+import { LoginPage } from './pages/LoginPage';
+import { RegisterPage } from './pages/RegisterPage';
+import { HomePage } from './pages/HomePage';
+import { HistoryPage } from './pages/HistoryPage';
+import { AdvancedFeaturesPage } from './pages/AdvancedFeaturesPage';
+import { DashboardLayout } from './components/DashboardLayout';
+import { DashboardPage } from './pages/DashboardPage';
+import { ApiKeysPage } from './pages/ApiKeysPage';
+import { UsagePage } from './pages/UsagePage';
+import { SubscriptionPage } from './pages/SubscriptionPage';
+import { BillingPage } from './pages/BillingPage';
+import { AdminLayout } from './components/AdminLayout';
+import { AdminUsers } from './components/AdminUsers';
+import { AdminPlans } from './components/AdminPlans';
+import { AdminAnalytics } from './components/AdminAnalytics';
+import { ProtectedRoute } from './components/ProtectedRoute';
 
 function App() {
   return (
     <BrowserRouter>
+      <Header />
       <Routes>
+        {/* PUBLIC Routes - No Authentication Required */}
+        <Route path="/" element={<HomePage />} />
+        <Route path="/history" element={<HistoryPage />} />
+        <Route path="/advanced" element={<AdvancedFeaturesPage />} />
+
         {/* Auth Routes */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
 
-        {/* Dashboard Routes */}
+        {/* PROTECTED Dashboard Routes - Authentication Required */}
         <Route
           path="/dashboard"
           element={
@@ -37,7 +47,7 @@ function App() {
           <Route path="billing" element={<BillingPage />} />
         </Route>
 
-        {/* Admin Routes */}
+        {/* PROTECTED Admin Routes - Admin Authentication Required */}
         <Route
           path="/admin"
           element={
@@ -76,11 +86,8 @@ function App() {
           }
         />
 
-        {/* Redirect to dashboard */}
-        <Route path="/" element={<Navigate to="/dashboard" />} />
-
-        {/* 404 */}
-        <Route path="*" element={<Navigate to="/dashboard" />} />
+        {/* Redirect unknown routes to home */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

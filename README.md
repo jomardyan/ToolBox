@@ -1,6 +1,8 @@
-# CSV Conversion Web App
+# ToolBox - Universal File Format Converter
 
-A modern, production-ready web application that converts CSV files to and from multiple data formats (JSON, XML, YAML, SQL, Excel, HTML, TSV, KML, TXT) with a beautiful, responsive UI.
+A modern, production-ready **SaaS application** that converts files between 20+ formats with a beautiful, responsive UI. **Free public converter** + optional premium dashboard.
+
+> 📚 **For Complete Documentation:** See [MASTER_DOCUMENTATION.md](./MASTER_DOCUMENTATION.md)
 
 ## Features
 
