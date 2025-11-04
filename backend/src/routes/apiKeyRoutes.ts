@@ -5,7 +5,7 @@ import ApiKeyService from '../services/apiKeyService';
 import UsageService from '../services/usageService';
 import { authenticateToken, requireAuth } from '../middleware/auth';
 import { AuthRequest } from '../types/auth';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 const router = Router();
 

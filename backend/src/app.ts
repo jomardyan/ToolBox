@@ -6,7 +6,7 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
-import { logger } from './utils/logger';
+import logger from './utils/logger';
 
 // Import routes
 import authRoutes from './routes/authRoutes';
@@ -17,6 +17,7 @@ import billingRoutes from './routes/billingRoutes';
 import adminAnalyticsRoutes from './routes/admin/analyticsRoutes';
 import adminUsersRoutes from './routes/admin/usersRoutes';
 import adminPlansRoutes from './routes/admin/plansRoutes';
+import webhookRoutes from './routes/webhookRoutes';
 
 const app: Express = express();
 
@@ -79,6 +80,9 @@ app.use('/api/user/billing', billingRoutes);
 app.use('/api/admin/analytics', adminAnalyticsRoutes);
 app.use('/api/admin/users', adminUsersRoutes);
 app.use('/api/admin/plans', adminPlansRoutes);
+
+// Webhook routes (verify signature, not protected)
+app.use('/api/stripe', webhookRoutes);
 
 // ===== Error Handling =====
 

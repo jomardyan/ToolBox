@@ -1,5 +1,7 @@
 // backend/src/types/auth.ts
 
+import { Request } from 'express';
+
 export interface JwtPayload {
   userId: string;
   email: string;
@@ -8,7 +10,7 @@ export interface JwtPayload {
   exp?: number;
 }
 
-export interface AuthRequest extends Express.Request {
+export interface AuthRequest extends Request {
   user?: JwtPayload;
   apiKey?: {
     id: string;

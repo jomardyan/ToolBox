@@ -5,7 +5,7 @@ import { prisma } from '../config/database';
 import StripeService from '../services/stripeService';
 import { authenticateToken, requireAuth } from '../middleware/auth';
 import { AuthRequest } from '../types/auth';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 const router = Router();
 

@@ -3,7 +3,7 @@
 import { Request, Response, NextFunction } from 'express';
 import CryptoUtils from '../utils/cryptoUtils';
 import { AuthRequest } from '../types/auth';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 /**
  * Middleware to verify JWT token
