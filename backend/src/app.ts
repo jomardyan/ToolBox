@@ -10,6 +10,7 @@ import logger from './utils/logger';
 
 // Import routes
 import authRoutes from './routes/authRoutes';
+import accountRoutes from './routes/accountRoutes';
 import apiKeyRoutes from './routes/apiKeyRoutes';
 import usageRoutes from './routes/usageRoutes';
 import subscriptionRoutes from './routes/subscriptionRoutes';
@@ -18,6 +19,8 @@ import adminAnalyticsRoutes from './routes/admin/analyticsRoutes';
 import adminUsersRoutes from './routes/admin/usersRoutes';
 import adminPlansRoutes from './routes/admin/plansRoutes';
 import webhookRoutes from './routes/webhookRoutes';
+import oauthRoutes from './routes/oauthRoutes';
+import twoFactorRoutes from './routes/twoFactorRoutes';
 
 const app: Express = express();
 
@@ -70,7 +73,14 @@ app.get('/health', (req: Request, res: Response) => {
 // Public auth routes
 app.use('/api/auth', authRoutes);
 
+// OAuth routes (public)
+app.use('/api/oauth', oauthRoutes);
+
+// 2FA routes (public - auth middleware added in routes)
+app.use('/api/2fa', twoFactorRoutes);
+
 // User routes (protected)
+app.use('/api/user/account', accountRoutes);
 app.use('/api/user/api-keys', apiKeyRoutes);
 app.use('/api/user/usage', usageRoutes);
 app.use('/api/user/subscription', subscriptionRoutes);

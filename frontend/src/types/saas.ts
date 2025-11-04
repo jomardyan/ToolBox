@@ -12,6 +12,7 @@ export interface Plan {
   rateLimit: number;
   monthlyLimit: number | null;
   maxApiKeys: number;
+  supportLevel?: string;
   status: 'active' | 'archived';
 }
 

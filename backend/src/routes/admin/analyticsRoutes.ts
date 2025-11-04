@@ -4,7 +4,7 @@ import { Router, Response } from 'express';
 import { prisma } from '../../config/database';
 import { authenticateToken, requireAdmin } from '../../middleware/auth';
 import { AuthRequest } from '../../types/auth';
-import { logger } from '../../utils/logger';
+import logger from '../../utils/logger';
 import { BillingMetrics, ApiMetrics, UserAnalytics } from '../../types/saas';
 
 const router = Router();
@@ -47,7 +47,7 @@ router.get('/revenue', authenticateToken, requireAdmin, async (req: AuthRequest,
 
     // Format monthly data
     const monthly: Record<string, number> = {};
-    monthlyData.forEach(record => {
+    monthlyData.forEach((record: any) => {
       const month = record.createdAt.toISOString().slice(0, 7);
       monthly[month] = (monthly[month] || 0) + (record._sum.amount || 0);
     });
@@ -101,20 +101,20 @@ router.get('/api', authenticateToken, requireAdmin, async (req: AuthRequest, res
     });
 
     const totalCalls = logs.length;
-    const errorCalls = logs.filter(l => l.statusCode >= 400).length;
+    const errorCalls = logs.filter((l: any) => l.statusCode >= 400).length;
     const errorRate = totalCalls > 0 ? (errorCalls / totalCalls) * 100 : 0;
 
     const avgResponseTime = totalCalls > 0
-      ? Math.round(logs.reduce((sum, l) => sum + l.responseTimeMs, 0) / totalCalls)
+      ? Math.round(logs.reduce((sum: number, l: any) => sum + l.responseTimeMs, 0) / totalCalls)
       : 0;
 
-    const responseTimes = logs.map(l => l.responseTimeMs).sort((a, b) => a - b);
+    const responseTimes = logs.map((l: any) => l.responseTimeMs).sort((a: number, b: number) => a - b);
     const p95 = responseTimes[Math.floor(responseTimes.length * 0.95)] || 0;
     const p99 = responseTimes[Math.floor(responseTimes.length * 0.99)] || 0;
 
     // Group by status code
     const statusGroups: Record<number, number> = {};
-    logs.forEach(log => {
+    logs.forEach((log: any) => {
       statusGroups[log.statusCode] = (statusGroups[log.statusCode] || 0) + 1;
     });
 
@@ -175,7 +175,7 @@ router.get('/users', authenticateToken, requireAdmin, async (req: AuthRequest, r
     });
 
     const usageStats = await Promise.all(
-      allUsers.map(async (user) => {
+      allUsers.map(async (user: any) => {
         const count = await prisma.usageLog.count({
           where: {
             userId: user.id,
@@ -237,7 +237,7 @@ router.get('/top-users', authenticateToken, requireAdmin, async (req: AuthReques
 
     // Get user details
     const users = await Promise.all(
-      topUsers.map(async (record) => {
+      topUsers.map(async (record: any) => {
         const user = await prisma.user.findUnique({
           where: { id: record.userId },
           select: { id: true, email: true, firstName: true, lastName: true, companyName: true }

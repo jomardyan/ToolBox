@@ -3,6 +3,7 @@
 import { Router, Response } from 'express';
 import ApiKeyService from '../services/apiKeyService';
 import UsageService from '../services/usageService';
+import AuditService from '../services/auditService';
 import { authenticateToken, requireAuth } from '../middleware/auth';
 import { AuthRequest } from '../types/auth';
 import logger from '../utils/logger';
@@ -66,6 +67,9 @@ router.post('/', authenticateToken, requireAuth, async (req: AuthRequest, res: R
 
     const result = await ApiKeyService.createApiKey(req.user.userId, name);
 
+    // Log API key creation
+    await AuditService.logApiKeyCreated(req.user.userId, result.keyPrefix, name, req.ip);
+
     res.status(201).json({
       success: true,
       data: result,
@@ -99,6 +103,9 @@ router.delete('/:id', authenticateToken, requireAuth, async (req: AuthRequest, r
     const { id } = req.params;
 
     await ApiKeyService.revokeApiKey(req.user.userId, id);
+
+    // Log API key revocation
+    await AuditService.logApiKeyRevoked(req.user.userId, id, req.ip);
 
     res.json({
       success: true,

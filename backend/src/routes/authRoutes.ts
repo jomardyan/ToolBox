@@ -2,6 +2,7 @@
 
 import { Router, Response } from 'express';
 import AuthService from '../services/authService';
+import AuditService from '../services/auditService';
 import { authenticateToken, requireAuth } from '../middleware/auth';
 import { AuthRequest } from '../types/auth';
 import logger from '../utils/logger';
@@ -41,6 +42,9 @@ router.post('/register', async (req: AuthRequest, res: Response) => {
       companyName
     });
 
+    // Log registration
+    await AuditService.logRegistration(result.user.id, req.ip);
+
     res.status(201).json({
       success: true,
       data: result,
@@ -73,6 +77,9 @@ router.post('/login', async (req: AuthRequest, res: Response) => {
     }
 
     const result = await AuthService.login({ email, password });
+
+    // Log login
+    await AuditService.logLogin(result.user.id, req.ip);
 
     // Set refresh token in secure cookie
     res.cookie('refreshToken', result.tokens.refreshToken, {
@@ -259,6 +266,9 @@ router.post('/logout', authenticateToken, async (req: AuthRequest, res: Response
     }
 
     await AuthService.logout(req.user.userId);
+
+    await AuthService.logout(req.user.userId);
+    await AuditService.logLogout(req.user.userId, req.ip);
 
     res.clearCookie('refreshToken');
     res.json({

@@ -4,10 +4,6 @@ import React, { useEffect, useState } from 'react';
 import { api } from '../../utils/apiClient';
 import type { ApiKey } from '../../types/saas';
 
-interface ApiKeyWithSecret extends ApiKey {
-  key?: string;
-}
-
 export const ApiKeysManager: React.FC = () => {
   const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
   const [showNewKey, setShowNewKey] = useState<string | null>(null);

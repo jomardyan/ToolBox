@@ -2,15 +2,14 @@
 
 import { Router, Request, Response, NextFunction } from 'express';
 import Stripe from 'stripe';
-import { db } from '../config/database';
+import { prisma } from '../config/database';
 import logger from '../utils/logger';
+import emailService from '../services/emailService';
 
 const router = Router();
 
 // Initialize Stripe with webhook secret
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2024-04-10'
-});
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
 const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET || '';
 
@@ -87,7 +86,7 @@ router.post('/webhook', async (req: Request, res: Response, next: NextFunction) 
 
     // Record webhook event in database
     try {
-      await db.stripeWebhookEvent.create({
+      await prisma.stripeWebhookEvent.create({
         data: {
           stripeEventId: event.id,
           type: event.type,
@@ -121,7 +120,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     });
 
     // Find user by Stripe customer ID
-    const user = await db.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { stripeCustomerId: subscription.customer as string }
     });
 
@@ -132,7 +131,7 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
 
     // Get plan from Stripe price ID
     const priceId = subscription.items.data[0]?.price.id;
-    const plan = await db.plan.findUnique({
+    const plan = await prisma.plan.findUnique({
       where: { stripePriceId: priceId }
     });
 
@@ -144,9 +143,9 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
     // Create or update subscription
     const subscriptionStatus = subscription.status === 'active' ? 'ACTIVE' : 'PENDING';
 
-    const nextBillingDate = new Date(subscription.current_period_end * 1000);
+    const nextBillingDate = new Date((subscription as any).current_period_end * 1000);
 
-    await db.subscription.upsert({
+    await prisma.subscription.upsert({
       where: {
         userId_planId: {
           userId: user.id,
@@ -158,14 +157,14 @@ async function handleSubscriptionCreated(subscription: Stripe.Subscription) {
         planId: plan.id,
         stripeSubscriptionId: subscription.id,
         status: subscriptionStatus,
-        currentPeriodStart: new Date(subscription.current_period_start * 1000),
+        currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
         currentPeriodEnd: nextBillingDate,
         cancelledAt: null
       },
       update: {
         status: subscriptionStatus,
         stripeSubscriptionId: subscription.id,
-        currentPeriodStart: new Date(subscription.current_period_start * 1000),
+        currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
         currentPeriodEnd: nextBillingDate
       }
     });
@@ -190,7 +189,7 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
     });
 
     // Find subscription by Stripe ID
-    const existingSubscription = await db.subscription.findUnique({
+    const existingSubscription = await prisma.subscription.findUnique({
       where: { stripeSubscriptionId: subscription.id }
     });
 
@@ -201,13 +200,13 @@ async function handleSubscriptionUpdated(subscription: Stripe.Subscription) {
 
     // Update subscription status
     const status = subscription.status === 'active' ? 'ACTIVE' : 'PENDING';
-    const nextBillingDate = new Date(subscription.current_period_end * 1000);
+    const nextBillingDate = new Date((subscription as any).current_period_end * 1000);
 
-    await db.subscription.update({
+    await prisma.subscription.update({
       where: { id: existingSubscription.id },
       data: {
         status,
-        currentPeriodStart: new Date(subscription.current_period_start * 1000),
+        currentPeriodStart: new Date((subscription as any).current_period_start * 1000),
         currentPeriodEnd: nextBillingDate
       }
     });
@@ -232,7 +231,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     });
 
     // Find and update subscription
-    const existingSubscription = await db.subscription.findUnique({
+    const existingSubscription = await prisma.subscription.findUnique({
       where: { stripeSubscriptionId: subscription.id }
     });
 
@@ -242,7 +241,7 @@ async function handleSubscriptionDeleted(subscription: Stripe.Subscription) {
     }
 
     // Mark subscription as cancelled
-    await db.subscription.update({
+    await prisma.subscription.update({
       where: { id: existingSubscription.id },
       data: {
         status: 'CANCELLED',
@@ -271,7 +270,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     });
 
     // Find user by Stripe customer ID
-    const user = await db.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { stripeCustomerId: invoice.customer as string }
     });
 
@@ -283,7 +282,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
     // Create billing record
     const amount = invoice.amount_paid / 100; // Convert cents to dollars
 
-    const existingRecord = await db.billingRecord.findFirst({
+    const existingRecord = await prisma.billingRecord.findFirst({
       where: {
         stripeInvoiceId: invoice.id
       }
@@ -293,14 +292,14 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       // Find related subscription to link to plan
       let subscriptionId: string | null = null;
 
-      if (invoice.subscription) {
-        const subscription = await db.subscription.findUnique({
-          where: { stripeSubscriptionId: invoice.subscription as string }
+      if ((invoice as any).subscription) {
+        const subscription = await prisma.subscription.findUnique({
+          where: { stripeSubscriptionId: (invoice as any).subscription as string }
         });
         subscriptionId = subscription?.id || null;
       }
 
-      await db.billingRecord.create({
+      await prisma.billingRecord.create({
         data: {
           userId: user.id,
           subscriptionId,
@@ -308,7 +307,7 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
           amount,
           currency: invoice.currency || 'usd',
           status: 'PAID',
-          paidAt: new Date(invoice.paid_date ? invoice.paid_date * 1000 : Date.now()),
+          paidAt: new Date((invoice as any).paid_date ? (invoice as any).paid_date * 1000 : Date.now()),
           description: invoice.description || 'Invoice payment',
           type: 'SUBSCRIPTION'
         }
@@ -317,16 +316,28 @@ async function handleInvoicePaymentSucceeded(invoice: Stripe.Invoice) {
       logger.info(`Billing record created for user ${user.id}: $${amount}`);
     } else {
       // Update existing record
-      await db.billingRecord.update({
+      await prisma.billingRecord.update({
         where: { id: existingRecord.id },
         data: {
           status: 'PAID',
-          paidAt: new Date(invoice.paid_date ? invoice.paid_date * 1000 : Date.now())
+          paidAt: new Date((invoice as any).paid_date ? (invoice as any).paid_date * 1000 : Date.now())
         }
       });
 
       logger.info(`Billing record updated for user ${user.id}`);
     }
+
+    // Send payment confirmation email
+    const invoiceUrl = invoice.hosted_invoice_url || `${process.env.FRONTEND_URL}/dashboard/billing`;
+    await emailService.sendPaymentConfirmationEmail(
+      {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+      invoice.amount_paid,
+      invoiceUrl
+    );
 
   } catch (err: any) {
     logger.error(`Error handling invoice.payment_succeeded: ${err.message}`, {
@@ -347,7 +358,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     });
 
     // Find user by Stripe customer ID
-    const user = await db.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { stripeCustomerId: invoice.customer as string }
     });
 
@@ -359,7 +370,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
     // Create or update billing record
     const amount = (invoice.amount_remaining || invoice.amount_due) / 100; // Convert cents to dollars
 
-    let billingRecord = await db.billingRecord.findFirst({
+    let billingRecord = await prisma.billingRecord.findFirst({
       where: {
         stripeInvoiceId: invoice.id
       }
@@ -369,14 +380,14 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
       // Find related subscription
       let subscriptionId: string | null = null;
 
-      if (invoice.subscription) {
-        const subscription = await db.subscription.findUnique({
-          where: { stripeSubscriptionId: invoice.subscription as string }
+      if ((invoice as any).subscription) {
+        const subscription = await prisma.subscription.findUnique({
+          where: { stripeSubscriptionId: (invoice as any).subscription as string }
         });
         subscriptionId = subscription?.id || null;
       }
 
-      billingRecord = await db.billingRecord.create({
+      billingRecord = await prisma.billingRecord.create({
         data: {
           userId: user.id,
           subscriptionId,
@@ -390,7 +401,7 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
       });
     } else {
       // Update existing record
-      await db.billingRecord.update({
+      await prisma.billingRecord.update({
         where: { id: billingRecord.id },
         data: {
           status: 'FAILED',
@@ -401,7 +412,17 @@ async function handleInvoicePaymentFailed(invoice: Stripe.Invoice) {
 
     logger.info(`Payment failure recorded for user ${user.id}`);
 
-    // TODO: Send email to user about failed payment
+    // Send email to user about failed payment
+    const retryUrl = `${process.env.FRONTEND_URL}/dashboard/billing`;
+    await emailService.sendPaymentFailedEmail(
+      {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+      },
+      invoice.amount_due || 0,
+      retryUrl
+    );
 
   } catch (err: any) {
     logger.error(`Error handling invoice.payment_failed: ${err.message}`, {
@@ -422,16 +443,16 @@ async function handleChargeRefunded(charge: Stripe.Charge) {
     });
 
     // Find related billing record and update it
-    const billingRecord = await db.billingRecord.findFirst({
+    const billingRecord = await prisma.billingRecord.findFirst({
       where: {
-        stripeInvoiceId: charge.invoice as string
+        stripeInvoiceId: (charge as any).invoice as string
       }
     });
 
     if (billingRecord) {
       const refundAmount = charge.amount_refunded / 100;
 
-      await db.billingRecord.update({
+      await prisma.billingRecord.update({
         where: { id: billingRecord.id },
         data: {
           status: 'REFUNDED',

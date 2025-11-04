@@ -3,17 +3,17 @@ import { useAuthStore } from '../store/authStore';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  adminOnly?: boolean;
+  requiredRole?: 'admin' | 'user';
 }
 
-export const ProtectedRoute = ({ children, adminOnly = false }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
   const { user, isAuthenticated } = useAuthStore();
 
   if (!isAuthenticated || !user) {
     return <Navigate to="/login" />;
   }
 
-  if (adminOnly && user.role !== 'admin') {
+  if (requiredRole && user.role !== requiredRole) {
     return <Navigate to="/dashboard" />;
   }
 

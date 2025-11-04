@@ -1,7 +1,7 @@
 // backend/src/services/usageService.ts
 
 import { prisma } from '../config/database';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 import { UsageMetrics } from '../types/saas';
 
 export class UsageService {
@@ -62,12 +62,12 @@ export class UsageService {
 
       // Calculate metrics
       const totalRequests = logs.length;
-      const totalCost = logs.reduce((sum, log) => sum + log.cost, 0);
+      const totalCost = logs.reduce((sum: number, log: any) => sum + log.cost, 0);
 
       const requestsByEndpoint: Record<string, number> = {};
       const costByEndpoint: Record<string, number> = {};
 
-      logs.forEach(log => {
+      logs.forEach((log: any) => {
         requestsByEndpoint[log.endpoint] = (requestsByEndpoint[log.endpoint] || 0) + 1;
         costByEndpoint[log.endpoint] = (costByEndpoint[log.endpoint] || 0) + log.cost;
       });
@@ -85,7 +85,7 @@ export class UsageService {
       // Get daily usage
       const dailyUsage: Record<string, { requests: number; cost: number }> = {};
 
-      logs.forEach(log => {
+      logs.forEach((log: any) => {
         const date = log.timestamp.toISOString().split('T')[0];
         if (!dailyUsage[date]) {
           dailyUsage[date] = { requests: 0, cost: 0 };
@@ -194,14 +194,14 @@ export class UsageService {
       });
 
       const totalRequests = logs.length;
-      const totalCost = logs.reduce((sum, log) => sum + log.cost, 0);
-      const totalTokens = logs.reduce((sum, log) => sum + log.tokensUsed, 0);
+      const totalCost = logs.reduce((sum: number, log: any) => sum + log.cost, 0);
+      const totalTokens = logs.reduce((sum: number, log: any) => sum + log.tokensUsed, 0);
 
-      const errorCount = logs.filter(log => log.statusCode >= 400).length;
+      const errorCount = logs.filter((log: any) => log.statusCode >= 400).length;
       const errorRate = totalRequests > 0 ? (errorCount / totalRequests) * 100 : 0;
 
       const avgResponseTime = totalRequests > 0
-        ? Math.round(logs.reduce((sum, log) => sum + log.responseTimeMs, 0) / totalRequests)
+        ? Math.round(logs.reduce((sum: number, log: any) => sum + log.responseTimeMs, 0) / totalRequests)
         : 0;
 
       return {

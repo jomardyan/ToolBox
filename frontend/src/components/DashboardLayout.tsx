@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useAuthStore } from '../store/authStore';
 
@@ -21,7 +20,7 @@ export const DashboardLayout = () => {
             </div>
             <div className="flex items-center space-x-4">
               <span className="text-gray-700">{user.email}</span>
-              {user.role === 'ADMIN' && (
+              {user.role === 'admin' && (
                 <span className="px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs font-medium">Admin</span>
               )}
               <button
@@ -60,7 +59,7 @@ export const DashboardLayout = () => {
               Billing
             </a>
 
-            {user.role === 'ADMIN' && (
+            {user.role === 'admin' && (
               <>
                 <div className="border-t my-2"></div>
                 <div className="px-4 py-2 text-xs font-semibold text-gray-500 uppercase">Admin</div>

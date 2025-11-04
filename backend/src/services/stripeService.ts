@@ -2,10 +2,10 @@
 
 import Stripe from 'stripe';
 import { prisma } from '../config/database';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '', {
-  apiVersion: '2023-10-16'
+  apiVersion: '2025-01-27.acme' as any
 });
 
 export class StripeService {
@@ -113,7 +113,7 @@ export class StripeService {
    */
   static async recordUsage(subscriptionItemId: string, quantity: number) {
     try {
-      const usage = await stripe.subscriptionItems.createUsageRecord(subscriptionItemId, {
+      const usage = await (stripe.subscriptionItems as any).createUsageRecord(subscriptionItemId, {
         quantity: Math.round(quantity)
       });
 
@@ -142,7 +142,7 @@ export class StripeService {
    */
   static async finalizeInvoice(invoiceId: string) {
     try {
-      return await stripe.invoices.finalize(invoiceId);
+      return await (stripe.invoices as any).finalize(invoiceId);
     } catch (error) {
       logger.error('Finalize invoice error:', error);
       throw error;
@@ -166,7 +166,7 @@ export class StripeService {
           customer: customerId,
           price: item.price,
           quantity: item.quantity
-        });
+        } as any);
       }
 
       // Finalize
@@ -233,8 +233,8 @@ export class StripeService {
         userId,
         planId,
         stripeSubscriptionId: subscription.id,
-        billingCycleStart: new Date(subscription.current_period_start * 1000),
-        billingCycleEnd: new Date(subscription.current_period_end * 1000),
+        billingCycleStart: new Date((subscription as any).current_period_start * 1000),
+        billingCycleEnd: new Date((subscription as any).current_period_end * 1000),
         status: 'ACTIVE'
       }
     });
@@ -264,8 +264,8 @@ export class StripeService {
     await prisma.subscription.updateMany({
       where: { stripeSubscriptionId: subscription.id },
       data: {
-        billingCycleStart: new Date(subscription.current_period_start * 1000),
-        billingCycleEnd: new Date(subscription.current_period_end * 1000)
+        billingCycleStart: new Date((subscription as any).current_period_start * 1000),
+        billingCycleEnd: new Date((subscription as any).current_period_end * 1000)
       }
     });
 

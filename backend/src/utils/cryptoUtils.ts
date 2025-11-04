@@ -42,15 +42,15 @@ export class CryptoUtils {
    * Generate JWT tokens
    */
   static generateTokens(payload: Omit<JwtPayload, 'iat' | 'exp'>): TokenPair {
-    const accessToken = jwt.sign(payload, JWT_SECRET, {
-      expiresIn: JWT_EXPIRATION,
+    const accessToken = jwt.sign(payload, JWT_SECRET as string, {
+      expiresIn: JWT_EXPIRATION as string,
       algorithm: 'HS256'
-    });
+    } as any);
 
-    const refreshToken = jwt.sign(payload, JWT_REFRESH_SECRET, {
-      expiresIn: JWT_REFRESH_EXPIRATION,
+    const refreshToken = jwt.sign(payload, JWT_REFRESH_SECRET as string, {
+      expiresIn: JWT_REFRESH_EXPIRATION as string,
       algorithm: 'HS256'
-    });
+    } as any);
 
     return { accessToken, refreshToken };
   }

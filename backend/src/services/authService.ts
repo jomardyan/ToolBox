@@ -3,7 +3,8 @@
 import { prisma } from '../config/database';
 import CryptoUtils from '../utils/cryptoUtils';
 import { RegisterInput, LoginInput, JwtPayload, TokenPair } from '../types/auth';
-import { logger } from '../utils/logger';
+import logger from '../utils/logger';
+import { emailUtils } from '../utils/emailUtils';
 
 export class AuthService {
   /**
@@ -57,6 +58,13 @@ export class AuthService {
           expiresAt: new Date(Date.now() + 15 * 60 * 1000) // 15 minutes
         }
       });
+
+      // Send verification email
+      await emailUtils.sendEmailVerification(
+        user.email,
+        emailVerificationToken,
+        user.firstName
+      );
 
       logger.info(`User registered: ${user.email}`);
 
@@ -244,6 +252,9 @@ export class AuthService {
           passwordResetExpires: resetExpires
         }
       });
+
+      // Send password reset email
+      await emailUtils.sendPasswordReset(email, resetToken, user.firstName);
 
       logger.info(`Password reset requested for user: ${email}`);
 
