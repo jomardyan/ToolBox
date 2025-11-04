@@ -13,7 +13,46 @@ import {
 
 const router = Router();
 
-// POST /api/convert - Generic conversion endpoint
+/**
+ * @swagger
+ * /api/convert:
+ *   post:
+ *     summary: Convert data between formats
+ *     description: Converts data from one format to another. Supports CSV, JSON, XML, YAML, HTML, Table, TSV, KML, TXT, Markdown, JSONL, NDJSON, Lines, ICS, TOML, Excel, and SQL formats.
+ *     tags:
+ *       - Conversion
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ConversionRequest'
+ *     responses:
+ *       200:
+ *         description: Conversion successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ConversionResponse'
+ *       400:
+ *         description: Invalid request or format
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       413:
+ *         description: Data too large (max 5MB)
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.post('/convert', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { data, sourceFormat, targetFormat, options } = req.body;
@@ -46,7 +85,7 @@ router.post('/convert', async (req: Request, res: Response, next: NextFunction) 
     if (!isValidFormat(sourceFormat) || !isValidFormat(targetFormat)) {
       return res.status(400).json({
         success: false,
-        error: `Invalid format. Supported formats: csv, json, xml, yaml, html, tsv, kml, txt`,
+        error: `Invalid format. Supported formats: csv, json, xml, yaml, html, table, tsv, kml, txt, markdown, jsonl, ndjson, lines, ics, toml, excel, sql`,
         statusCode: 400,
       });
     }
@@ -65,6 +104,40 @@ router.post('/convert', async (req: Request, res: Response, next: NextFunction) 
 });
 
 // POST /api/batch-convert - Batch conversion of multiple items
+/**
+ * @swagger
+ * /api/batch-convert:
+ *   post:
+ *     summary: Batch convert multiple items
+ *     description: Convert multiple data items in a single request. Maximum 100 items per batch.
+ *     tags:
+ *       - Conversion
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/BatchConversionRequest'
+ *     responses:
+ *       200:
+ *         description: Batch conversion completed
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/BatchConversionResponse'
+ *       400:
+ *         description: Invalid batch request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.post('/batch-convert', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { items } = req.body;
@@ -165,6 +238,46 @@ router.post('/batch-convert', async (req: Request, res: Response, next: NextFunc
 });
 
 // POST /api/extract/csv-columns - Extract specific columns from CSV
+/**
+ * @swagger
+ * /api/extract/csv-columns:
+ *   post:
+ *     summary: Extract specific columns from CSV
+ *     description: Extract and filter specific columns from CSV data
+ *     tags:
+ *       - Extraction
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/ColumnExtractionRequest'
+ *     responses:
+ *       200:
+ *         description: Column extraction successful
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ConversionResponse'
+ *       400:
+ *         description: Invalid request
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       413:
+ *         description: CSV data too large
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.post('/extract/csv-columns', async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { csvData, columns, filterOptions } = req.body;
@@ -224,6 +337,74 @@ router.post('/extract/csv-columns', async (req: Request, res: Response, next: Ne
 });
 
 // POST /api/presets - Save conversion preset
+/**
+ * @swagger
+ * /api/presets:
+ *   post:
+ *     summary: Create a conversion preset
+ *     description: Save a named conversion preset for quick access to frequently used conversions
+ *     tags:
+ *       - Presets
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             $ref: '#/components/schemas/PresetRequest'
+ *     responses:
+ *       200:
+ *         description: Preset created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   $ref: '#/components/schemas/Preset'
+ *                 statusCode:
+ *                   type: integer
+ *       400:
+ *         description: Invalid preset data
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ *   get:
+ *     summary: Get all conversion presets
+ *     description: Retrieve all saved conversion presets
+ *     tags:
+ *       - Presets
+ *     responses:
+ *       200:
+ *         description: Presets retrieved successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 data:
+ *                   type: array
+ *                   items:
+ *                     $ref: '#/components/schemas/Preset'
+ *                 statusCode:
+ *                   type: integer
+ *       500:
+ *         description: Server error
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/ErrorResponse'
+ */
 router.post('/presets', (req: Request, res: Response, next: NextFunction) => {
   try {
     const { name, sourceFormat, targetFormat, description } = req.body;
@@ -297,7 +478,22 @@ router.get('/presets', (req: Request, res: Response) => {
   });
 });
 
-// Health check endpoint
+/**
+ * @swagger
+ * /api/health:
+ *   get:
+ *     summary: Health check endpoint
+ *     description: Check if the API server is running and healthy
+ *     tags:
+ *       - Health
+ *     responses:
+ *       200:
+ *         description: Server is healthy
+ *         content:
+ *           application/json:
+ *             schema:
+ *               $ref: '#/components/schemas/HealthResponse'
+ */
 router.get('/health', (req: Request, res: Response) => {
   res.json({
     success: true,

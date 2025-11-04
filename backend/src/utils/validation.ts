@@ -20,6 +20,9 @@ export const ALLOWED_MIME_TYPES = [
   'text/html',
   'application/vnd.ms-excel',
   'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'application/sql',
+  'text/sql',
+  'application/x-sql',
 ];
 
 /**
@@ -82,7 +85,7 @@ export function sanitizeInput(input: string): string {
  * Validates format is supported
  */
 export function isValidFormat(format: string): boolean {
-  const validFormats = ['csv', 'json', 'xml', 'yaml', 'html', 'tsv', 'kml', 'txt'];
+  const validFormats = ['csv', 'json', 'xml', 'yaml', 'html', 'table', 'tsv', 'kml', 'txt', 'markdown', 'jsonl', 'ndjson', 'ics', 'toml', 'lines', 'excel', 'sql'];
   return typeof format === 'string' && validFormats.includes(format.toLowerCase());
 }
 

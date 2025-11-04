@@ -1,14 +1,77 @@
+# Dependencies
 node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Build outputs
 dist/
 build/
+*.tsbuildinfo
+
+# Environment variables
 .env
 .env.local
 .env.*.local
+.env.prod.local
+.env.test.local
+
+# Logs
+logs/
 *.log
-.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pids.txt
+
+# IDE and editor files
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
+*.sublime-workspace
+*.sublime-project
+
+# OS files
+.DS_Store
+Thumbs.db
+.DS_Store?
+*.icloud
+
+# Test coverage
+coverage/
+.nyc_output/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Build artifacts
+*.tgz
+dist-*
+
+# Docker volumes and databases
+.dockerignore
+db/
+data/
+
+# Runtime files
 .turbo/
+*.pid
+.env.production.local
+
+# IDE workspace files
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+
+# Node version managers
+.nvmrc
+.node-version
+
+# Package manager specific
+.pnp
+.pnp.js
+

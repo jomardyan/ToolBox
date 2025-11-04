@@ -1,5 +1,5 @@
 export type SupportedFormat = 
-  | 'json' | 'xml' | 'yaml' | 'sql' | 'excel' | 'html' | 'tsv' | 'kml' | 'txt' | 'csv';
+  | 'json' | 'xml' | 'yaml' | 'sql' | 'excel' | 'html' | 'table' | 'tsv' | 'kml' | 'txt' | 'csv' | 'markdown' | 'jsonl' | 'ndjson' | 'ics' | 'toml' | 'lines';
 
 export interface ConversionRequest {
   data: string;

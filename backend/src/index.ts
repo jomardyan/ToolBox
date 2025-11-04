@@ -1,11 +1,13 @@
 import express from 'express';
 import cors from 'cors';
 import rateLimit from 'express-rate-limit';
+import swaggerUi from 'swagger-ui-express';
 import 'dotenv/config';
 import apiRoutes from './routes';
 import { errorHandler } from './middleware/errorHandler';
 import logger from './utils/logger';
 import { RATE_LIMIT_CONFIG } from './utils/validation';
+import { swaggerSpec } from './swagger/swaggerConfig';
 
 const app = express();
 const PORT = parseInt(process.env.PORT || '3000', 10);
@@ -67,6 +69,20 @@ app.use('/api/extract', generalLimiter);
 app.use('/api/batch-convert', batchLimiter);
 app.use('/api/presets', generalLimiter);
 
+// Swagger documentation
+app.use('/api-docs', swaggerUi.serve);
+app.get('/api-docs', swaggerUi.setup(swaggerSpec, { 
+  swaggerOptions: {
+    url: '/api-docs/json',
+  }
+}));
+
+// Swagger JSON specification endpoint
+app.get('/api-docs/json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
+
 // API Routes
 app.use('/api', apiRoutes);
 
@@ -76,12 +92,14 @@ app.get('/', (req, res) => {
     success: true,
     message: 'CSV Conversion API Server',
     version: '1.0.0',
+    documentation: 'http://0.0.0.0:3000/api-docs',
     endpoints: {
       convert: 'POST /api/convert',
       batchConvert: 'POST /api/batch-convert',
       extract: 'POST /api/extract/csv-columns',
       presets: 'GET /api/presets',
       health: 'GET /api/health',
+      swagger: 'GET /api-docs',
     },
   });
 });

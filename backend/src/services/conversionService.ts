@@ -13,6 +13,22 @@ import {
   kmlToCSV,
   csvToTxt,
   txtToCSV,
+  csvToMarkdown,
+  markdownToCSV,
+  csvToJsonl,
+  jsonlToCSV,
+  csvToIcs,
+  icsToCSV,
+  csvToToml,
+  tomlToCSV,
+  csvToExcel,
+  excelToCSV,
+  csvToSql,
+  sqlToCSV,
+  csvToTable,
+  tableToCSV,
+  csvToLines,
+  linesToCSV,
 } from '../converters';
 import { SupportedFormat } from '../types';
 import logger from '../utils/logger';
@@ -43,16 +59,30 @@ export const convertFormat = (
       csvData = yamlToCSV(data);
     } else if (sourceFormat === 'html') {
       csvData = htmlToCSV(data);
+    } else if (sourceFormat === 'table') {
+      csvData = tableToCSV(data);
     } else if (sourceFormat === 'tsv') {
       csvData = tsvToCSV(data);
     } else if (sourceFormat === 'kml') {
       csvData = kmlToCSV(data);
     } else if (sourceFormat === 'txt') {
       csvData = txtToCSV(data);
-    } else if (sourceFormat === 'sql') {
-      throw new Error('SQL to CSV conversion not yet implemented');
+    } else if (sourceFormat === 'markdown') {
+      csvData = markdownToCSV(data);
+    } else if (sourceFormat === 'jsonl') {
+      csvData = jsonlToCSV(data);
+    } else if (sourceFormat === 'ndjson') {
+      csvData = jsonlToCSV(data); // NDJSON is same as JSONL
+    } else if (sourceFormat === 'lines') {
+      csvData = linesToCSV(data);
+    } else if (sourceFormat === 'ics') {
+      csvData = icsToCSV(data);
+    } else if (sourceFormat === 'toml') {
+      csvData = tomlToCSV(data);
     } else if (sourceFormat === 'excel') {
-      throw new Error('Excel to CSV conversion requires file upload');
+      csvData = excelToCSV(data);
+    } else if (sourceFormat === 'sql') {
+      csvData = sqlToCSV(data);
     } else {
       throw new Error(`Unknown source format: ${sourceFormat}`);
     }
@@ -70,16 +100,30 @@ export const convertFormat = (
       result = csvToYaml(csvData);
     } else if (targetFormat === 'html') {
       result = csvToHtml(csvData);
+    } else if (targetFormat === 'table') {
+      result = csvToTable(csvData);
     } else if (targetFormat === 'tsv') {
       result = csvToTsv(csvData);
     } else if (targetFormat === 'kml') {
       result = csvToKml(csvData);
     } else if (targetFormat === 'txt') {
       result = csvToTxt(csvData);
-    } else if (targetFormat === 'sql') {
-      throw new Error('CSV to SQL conversion not yet implemented');
+    } else if (targetFormat === 'markdown') {
+      result = csvToMarkdown(csvData);
+    } else if (targetFormat === 'jsonl') {
+      result = csvToJsonl(csvData);
+    } else if (targetFormat === 'ndjson') {
+      result = csvToJsonl(csvData); // NDJSON is same as JSONL
+    } else if (targetFormat === 'lines') {
+      result = csvToLines(csvData);
+    } else if (targetFormat === 'ics') {
+      result = csvToIcs(csvData);
+    } else if (targetFormat === 'toml') {
+      result = csvToToml(csvData);
     } else if (targetFormat === 'excel') {
-      throw new Error('CSV to Excel conversion requires multipart response');
+      result = csvToExcel(csvData);
+    } else if (targetFormat === 'sql') {
+      result = csvToSql(csvData);
     } else {
       throw new Error(`Unknown target format: ${targetFormat}`);
     }

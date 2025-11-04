@@ -8,7 +8,7 @@ interface FormatSelectorProps {
   label?: string;
 }
 
-const FORMATS: SupportedFormat[] = ['csv', 'json', 'xml', 'yaml', 'html', 'tsv', 'kml', 'txt'];
+const FORMATS: SupportedFormat[] = ['csv', 'json', 'xml', 'yaml', 'html', 'table', 'tsv', 'kml', 'txt', 'markdown', 'jsonl', 'ndjson', 'lines', 'ics', 'toml', 'excel', 'sql'];
 
 const FORMAT_COLORS: Record<SupportedFormat, { bg: string; text: string; hoverBg: string; border: string }> = {
   csv: { bg: 'bg-blue-100', text: 'text-blue-800', hoverBg: 'hover:bg-blue-200', border: 'border-blue-300' },
@@ -16,11 +16,18 @@ const FORMAT_COLORS: Record<SupportedFormat, { bg: string; text: string; hoverBg
   xml: { bg: 'bg-purple-100', text: 'text-purple-800', hoverBg: 'hover:bg-purple-200', border: 'border-purple-300' },
   yaml: { bg: 'bg-amber-100', text: 'text-amber-800', hoverBg: 'hover:bg-amber-200', border: 'border-amber-300' },
   html: { bg: 'bg-red-100', text: 'text-red-800', hoverBg: 'hover:bg-red-200', border: 'border-red-300' },
+  table: { bg: 'bg-indigo-100', text: 'text-indigo-800', hoverBg: 'hover:bg-indigo-200', border: 'border-indigo-300' },
   tsv: { bg: 'bg-cyan-100', text: 'text-cyan-800', hoverBg: 'hover:bg-cyan-200', border: 'border-cyan-300' },
   kml: { bg: 'bg-sky-100', text: 'text-sky-800', hoverBg: 'hover:bg-sky-200', border: 'border-sky-300' },
   txt: { bg: 'bg-gray-100', text: 'text-gray-800', hoverBg: 'hover:bg-gray-200', border: 'border-gray-300' },
   sql: { bg: 'bg-pink-100', text: 'text-pink-800', hoverBg: 'hover:bg-pink-200', border: 'border-pink-300' },
   excel: { bg: 'bg-emerald-100', text: 'text-emerald-800', hoverBg: 'hover:bg-emerald-200', border: 'border-emerald-300' },
+  markdown: { bg: 'bg-slate-100', text: 'text-slate-800', hoverBg: 'hover:bg-slate-200', border: 'border-slate-300' },
+  jsonl: { bg: 'bg-lime-100', text: 'text-lime-800', hoverBg: 'hover:bg-lime-200', border: 'border-lime-300' },
+  ndjson: { bg: 'bg-teal-100', text: 'text-teal-800', hoverBg: 'hover:bg-teal-200', border: 'border-teal-300' },
+  lines: { bg: 'bg-fuchsia-100', text: 'text-fuchsia-800', hoverBg: 'hover:bg-fuchsia-200', border: 'border-fuchsia-300' },
+  ics: { bg: 'bg-violet-100', text: 'text-violet-800', hoverBg: 'hover:bg-violet-200', border: 'border-violet-300' },
+  toml: { bg: 'bg-orange-100', text: 'text-orange-800', hoverBg: 'hover:bg-orange-200', border: 'border-orange-300' },
 };
 
 export const FormatSelector: React.FC<FormatSelectorProps> = ({

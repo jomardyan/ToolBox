@@ -307,6 +307,359 @@ export const txtToCSV = (txtData: string): string => {
   return generateCSV(rows);
 };
 
+export const csvToMarkdown = (csvData: string): string => {
+  const { headers, rows } = parseCSV(csvData);
+  
+  let markdown = '| ' + headers.join(' | ') + ' |\n';
+  markdown += '| ' + headers.map(() => '---').join(' | ') + ' |\n';
+  
+  rows.forEach((row) => {
+    const values = headers.map((header) => String(row[header] || ''));
+    markdown += '| ' + values.join(' | ') + ' |\n';
+  });
+  
+  return markdown;
+};
+
+export const markdownToCSV = (markdownData: string): string => {
+  const lines = markdownData.split('\n').filter((line) => line.trim());
+  
+  if (lines.length < 3) {
+    throw new Error('Invalid markdown table format');
+  }
+  
+  const headers = lines[0]
+    .split('|')
+    .map((h) => h.trim())
+    .filter((h) => h.length > 0);
+  
+  const rows: Record<string, any>[] = [];
+  
+  for (let i = 2; i < lines.length; i++) {
+    const values = lines[i]
+      .split('|')
+      .map((v) => v.trim())
+      .filter((v, idx) => idx < headers.length);
+    
+    if (values.length === headers.length) {
+      const row: Record<string, any> = {};
+      headers.forEach((header, index) => {
+        row[header] = values[index] || '';
+      });
+      rows.push(row);
+    }
+  }
+  
+  return generateCSV(rows, headers);
+};
+
+export const csvToJsonl = (csvData: string): string => {
+  const { rows } = parseCSV(csvData);
+  
+  return rows
+    .map((row) => JSON.stringify(row))
+    .join('\n');
+};
+
+export const jsonlToCSV = (jsonlData: string): string => {
+  const lines = jsonlData.split('\n').filter((line) => line.trim());
+  
+  if (lines.length === 0) {
+    throw new Error('No data found in JSONL');
+  }
+  
+  const rows: Record<string, any>[] = [];
+  
+  lines.forEach((line) => {
+    try {
+      const obj = JSON.parse(line);
+      if (typeof obj === 'object' && obj !== null && !Array.isArray(obj)) {
+        rows.push(obj);
+      }
+    } catch (e) {
+      // Skip invalid JSON lines
+    }
+  });
+  
+  if (rows.length === 0) {
+    throw new Error('No valid JSON objects found in JSONL');
+  }
+  
+  return generateCSV(rows);
+};
+
+export const csvToIcs = (csvData: string): string => {
+  const { rows } = parseCSV(csvData);
+  
+  // Assumes CSV has title, start_date, end_date, description columns
+  let ics = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//ToolBox//Events//EN
+CALSCALE:GREGORIAN
+`;
+  
+  rows.forEach((row) => {
+    const title = row.title || row.name || 'Event';
+    const startDate = row.start_date || row.date || '';
+    const endDate = row.end_date || startDate || '';
+    const description = row.description || '';
+    
+    if (startDate) {
+      ics += `BEGIN:VEVENT
+UID:${Date.now()}-${Math.random().toString(36).substr(2, 9)}@toolbox
+DTSTART:${formatDateForIcs(startDate)}
+DTEND:${formatDateForIcs(endDate || startDate)}
+SUMMARY:${escapeIcsField(title)}
+DESCRIPTION:${escapeIcsField(description)}
+END:VEVENT
+`;
+    }
+  });
+  
+  ics += 'END:VCALENDAR';
+  
+  return ics;
+};
+
+export const icsToCSV = (icsData: string): string => {
+  const rows: Record<string, any>[] = [];
+  
+  const eventRegex = /BEGIN:VEVENT([\s\S]*?)END:VEVENT/g;
+  let match;
+  
+  while ((match = eventRegex.exec(icsData)) !== null) {
+    const event = match[1];
+    const row: Record<string, any> = {};
+    
+    const summaryMatch = /SUMMARY:(.+?)(?:\r?\n|$)/i.exec(event);
+    const dtStartMatch = /DTSTART:(.+?)(?:\r?\n|$)/i.exec(event);
+    const dtEndMatch = /DTEND:(.+?)(?:\r?\n|$)/i.exec(event);
+    const descriptionMatch = /DESCRIPTION:(.+?)(?:\r?\n|$)/i.exec(event);
+    
+    if (summaryMatch) {
+      row.title = unescapeIcsField(summaryMatch[1]);
+    }
+    if (dtStartMatch) {
+      row.start_date = formatDateFromIcs(dtStartMatch[1]);
+    }
+    if (dtEndMatch) {
+      row.end_date = formatDateFromIcs(dtEndMatch[1]);
+    }
+    if (descriptionMatch) {
+      row.description = unescapeIcsField(descriptionMatch[1]);
+    }
+    
+    if (Object.keys(row).length > 0) {
+      rows.push(row);
+    }
+  }
+  
+  if (rows.length === 0) {
+    throw new Error('No events found in ICS');
+  }
+  
+  return generateCSV(rows);
+};
+
+export const csvToToml = (csvData: string): string => {
+  const { rows } = parseCSV(csvData);
+  
+  let toml = '';
+  
+  rows.forEach((row, index) => {
+    toml += `[[records]]\n`;
+    Object.entries(row).forEach(([key, value]) => {
+      const cleanKey = key.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+      const stringValue = String(value)
+        .replace(/\\/g, '\\\\')
+        .replace(/"/g, '\\"');
+      toml += `${cleanKey} = "${stringValue}"\n`;
+    });
+    if (index < rows.length - 1) {
+      toml += '\n';
+    }
+  });
+  
+  return toml;
+};
+
+export const tomlToCSV = (tomlData: string): string => {
+  const rows: Record<string, any>[] = [];
+  
+  // Simple TOML array of tables parser
+  const tableRegex = /\[\[records\]\]([\s\S]*?)(?=\[\[records\]\]|$)/g;
+  let match;
+  
+  while ((match = tableRegex.exec(tomlData)) !== null) {
+    const tableContent = match[1];
+    const row: Record<string, any> = {};
+    
+    const lineRegex = /(\w+)\s*=\s*"([^"]*)"/g;
+    let lineMatch;
+    
+    while ((lineMatch = lineRegex.exec(tableContent)) !== null) {
+      row[lineMatch[1]] = lineMatch[2];
+    }
+    
+    if (Object.keys(row).length > 0) {
+      rows.push(row);
+    }
+  }
+  
+  if (rows.length === 0) {
+    throw new Error('No records found in TOML');
+  }
+  
+  return generateCSV(rows);
+};
+
+// Excel Converters
+export const csvToExcel = (csvData: string): string => {
+  // For now, return CSV as-is with Excel-compatible formatting
+  // In a real implementation with binary output, would use ExcelJS
+  const { headers, rows } = parseCSV(csvData);
+  
+  // Create a tab-separated format that Excel can read
+  let excel = headers.join('\t') + '\n';
+  rows.forEach((row) => {
+    const values = headers.map((header) => {
+      const value = String(row[header] || '');
+      // Escape quotes for Excel
+      return value.includes('"') ? `"${value.replace(/"/g, '""')}"` : value;
+    });
+    excel += values.join('\t') + '\n';
+  });
+  
+  return excel;
+};
+
+export const excelToCSV = (excelData: string): string => {
+  // Parse tab-separated or Excel-formatted data
+  const lines = excelData.split('\n').filter((line) => line.trim());
+  
+  if (lines.length < 2) {
+    throw new Error('Invalid Excel data: at least header and one data row required');
+  }
+  
+  const headers = lines[0].split('\t').map((h) => h.trim());
+  const rows: Record<string, any>[] = [];
+  
+  for (let i = 1; i < lines.length; i++) {
+    const values = lines[i].split('\t').map((v) => {
+      // Unescape Excel quotes
+      return v.trim().replace(/^"|"$/g, '').replace(/""/g, '"');
+    });
+    
+    const row: Record<string, any> = {};
+    headers.forEach((header, index) => {
+      row[header] = values[index] || '';
+    });
+    rows.push(row);
+  }
+  
+  return generateCSV(rows, headers);
+};
+
+// SQL Converters
+export const csvToSql = (csvData: string, tableName: string = 'data'): string => {
+  const { headers, rows } = parseCSV(csvData);
+  
+  // Generate CREATE TABLE statement
+  let sql = `CREATE TABLE ${sanitizeSqlIdentifier(tableName)} (\n`;
+  sql += headers.map((h) => `  ${sanitizeSqlIdentifier(h)} VARCHAR(255)`).join(',\n');
+  sql += '\n);\n\n';
+  
+  // Generate INSERT statements
+  rows.forEach((row) => {
+    const columns = headers.map((h) => sanitizeSqlIdentifier(h)).join(', ');
+    const values = headers
+      .map((h) => {
+        const value = String(row[h] || '');
+        return `'${escapeSqlString(value)}'`;
+      })
+      .join(', ');
+    
+    sql += `INSERT INTO ${sanitizeSqlIdentifier(tableName)} (${columns}) VALUES (${values});\n`;
+  });
+  
+  return sql;
+};
+
+export const sqlToCSV = (sqlData: string): string => {
+  const rows: Record<string, any>[] = [];
+  let headers: string[] = [];
+  
+  // Parse CREATE TABLE to extract column names
+  const createRegex = /CREATE\s+TABLE\s+(\w+)\s*\(([\s\S]*?)\);/i;
+  const createMatch = createRegex.exec(sqlData);
+  
+  if (createMatch) {
+    const columnDefs = createMatch[2];
+    headers = columnDefs
+      .split(',')
+      .map((col) => {
+        const match = col.trim().match(/(\w+)/);
+        return match ? match[1] : '';
+      })
+      .filter((h) => h.length > 0);
+  }
+  
+  // Parse INSERT statements
+  const insertRegex = /INSERT\s+INTO\s+\w+\s*(?:\((.*?)\))?\s*VALUES\s*\(([\s\S]*?)\);/gi;
+  let insertMatch;
+  
+  while ((insertMatch = insertRegex.exec(sqlData)) !== null) {
+    const valuesStr = insertMatch[2];
+    const values = parseSqlValues(valuesStr);
+    
+    // If no headers from CREATE TABLE, extract from INSERT column list
+    if (headers.length === 0 && insertMatch[1]) {
+      headers = insertMatch[1]
+        .split(',')
+        .map((col) => col.trim().replace(/^`|`$/g, '').replace(/^"|"$/g, ''));
+    }
+    
+    const row: Record<string, any> = {};
+    if (headers.length > 0) {
+      headers.forEach((h, index) => {
+        row[h] = values[index] || '';
+      });
+    } else {
+      // Fallback if no headers found
+      values.forEach((v, index) => {
+        row[`column_${index + 1}`] = v;
+      });
+    }
+    
+    if (Object.keys(row).length > 0) {
+      rows.push(row);
+    }
+  }
+  
+  if (rows.length === 0) {
+    throw new Error('No INSERT statements found in SQL');
+  }
+  
+  return generateCSV(rows, headers.length > 0 ? headers : undefined);
+};
+
+// Aliases for naming consistency
+export const csvToTable = (csvData: string): string => {
+  return csvToHtml(csvData);
+};
+
+export const tableToCSV = (tableData: string): string => {
+  return htmlToCSV(tableData);
+};
+
+export const csvToLines = (csvData: string): string => {
+  return csvToJsonl(csvData);
+};
+
+export const linesToCSV = (linesData: string): string => {
+  return jsonlToCSV(linesData);
+};
+
 // Helper functions
 const sanitizeXmlTag = (tag: string): string => {
   return tag.replace(/[^a-zA-Z0-9_\-]/g, '_');
@@ -319,4 +672,99 @@ const escapeHtml = (text: string): string => {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+};
+
+const formatDateForIcs = (dateStr: string): string => {
+  try {
+    const date = new Date(dateStr);
+    if (isNaN(date.getTime())) {
+      return dateStr;
+    }
+    return date.toISOString().replace(/[-:]/g, '').split('.')[0] + 'Z';
+  } catch {
+    return dateStr;
+  }
+};
+
+const formatDateFromIcs = (icsDateStr: string): string => {
+  try {
+    const year = icsDateStr.substring(0, 4);
+    const month = icsDateStr.substring(4, 6);
+    const day = icsDateStr.substring(6, 8);
+    const hour = icsDateStr.substring(9, 11) || '00';
+    const minute = icsDateStr.substring(11, 13) || '00';
+    
+    return `${year}-${month}-${day} ${hour}:${minute}`;
+  } catch {
+    return icsDateStr;
+  }
+};
+
+const escapeIcsField = (field: string): string => {
+  return String(field)
+    .replace(/\\/g, '\\\\')
+    .replace(/,/g, '\\,')
+    .replace(/;/g, '\\;')
+    .replace(/\n/g, '\\n');
+};
+
+const unescapeIcsField = (field: string): string => {
+  return String(field)
+    .replace(/\\n/g, '\n')
+    .replace(/\\;/g, ';')
+    .replace(/\\,/g, ',')
+    .replace(/\\\\/g, '\\');
+};
+
+const sanitizeSqlIdentifier = (identifier: string): string => {
+  // Remove special characters and quote if necessary
+  const cleaned = identifier.replace(/[^a-zA-Z0-9_]/g, '_');
+  return /^\d/.test(cleaned) ? `_${cleaned}` : cleaned;
+};
+
+const escapeSqlString = (str: string): string => {
+  return String(str)
+    .replace(/\\/g, '\\\\')
+    .replace(/'/g, "''")
+    .replace(/\0/g, '\\0')
+    .replace(/\n/g, '\\n')
+    .replace(/\r/g, '\\r')
+    .replace(/\x1a/g, '\\Z');
+};
+
+const parseSqlValues = (valuesStr: string): string[] => {
+  const values: string[] = [];
+  let current = '';
+  let inQuotes = false;
+  let i = 0;
+  
+  while (i < valuesStr.length) {
+    const char = valuesStr[i];
+    const nextChar = valuesStr[i + 1];
+    
+    if (char === "'" && !inQuotes) {
+      inQuotes = true;
+      i++;
+    } else if (char === "'" && inQuotes && nextChar === "'") {
+      // Escaped quote
+      current += "'";
+      i += 2;
+    } else if (char === "'" && inQuotes) {
+      inQuotes = false;
+      i++;
+    } else if (char === ',' && !inQuotes) {
+      values.push(current.trim().replace(/^'|'$/g, '').replace(/''/g, "'"));
+      current = '';
+      i++;
+    } else {
+      current += char;
+      i++;
+    }
+  }
+  
+  if (current.trim()) {
+    values.push(current.trim().replace(/^'|'$/g, '').replace(/''/g, "'"));
+  }
+  
+  return values;
 };
