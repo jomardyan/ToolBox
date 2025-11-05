@@ -156,7 +156,7 @@ router.post('/:id/suspend', authenticateToken, requireAdmin, async (req: AuthReq
         action: 'SUSPEND',
         resourceType: 'USER',
         resourceId: id,
-        changes: { reason }
+        changes: JSON.stringify({ reason })
       }
     });
 

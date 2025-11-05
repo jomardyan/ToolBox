@@ -3,7 +3,28 @@
 import axios, { AxiosError } from 'axios';
 import type { AxiosInstance } from 'axios';
 
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api';
+// Dynamically determine the API base URL based on the current environment
+const getBaseURL = (): string => {
+  // Use environment variable if explicitly set
+  if (import.meta.env.VITE_API_BASE_URL) {
+    return import.meta.env.VITE_API_BASE_URL;
+  }
+
+  // Check if running on GitHub Codespaces
+  const hostname = window.location.hostname;
+  
+  if (hostname.includes('.app.github.dev')) {
+    // GitHub Codespaces: Replace port 5173 with 3000 in the hostname
+    // Example: xxx-5173.app.github.dev -> xxx-3000.app.github.dev
+    const baseURL = `https://${hostname.replace('-5173.', '-3000.')}/api`;
+    return baseURL;
+  }
+
+  // Local development fallback
+  return 'http://localhost:3000/api';
+};
+
+const baseURL = getBaseURL();
 
 const apiClient: AxiosInstance = axios.create({
   baseURL,

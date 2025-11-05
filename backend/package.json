@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "dev": "nodemon --exec ts-node src/index.ts",
+    "dev:setup": "npx prisma migrate dev --name init && npx ts-node scripts/setup-db.ts",
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "jest",
@@ -14,7 +15,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@prisma/client": "^6.18.0",
+    "@prisma/client": "^6.19.0",
     "@types/bcrypt": "^6.0.0",
     "@types/ioredis": "^4.28.10",
     "@types/jsonwebtoken": "^9.0.10",
@@ -37,6 +38,7 @@
     "jsonwebtoken": "^9.0.2",
     "nodemailer": "^7.0.10",
     "papaparse": "^5.5.3",
+    "prisma": "^6.19.0",
     "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0",
     "sql.js": "^1.13.0",

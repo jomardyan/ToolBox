@@ -65,7 +65,9 @@ function App() {
           path="/admin/users"
           element={
             <ProtectedRoute requiredRole="admin">
-              <AdminUsers />
+              <AdminLayout title="Users Management">
+                <AdminUsers />
+              </AdminLayout>
             </ProtectedRoute>
           }
         />
@@ -73,7 +75,9 @@ function App() {
           path="/admin/plans"
           element={
             <ProtectedRoute requiredRole="admin">
-              <AdminPlans />
+              <AdminLayout title="Plans Management">
+                <AdminPlans />
+              </AdminLayout>
             </ProtectedRoute>
           }
         />
@@ -81,7 +85,9 @@ function App() {
           path="/admin/analytics"
           element={
             <ProtectedRoute requiredRole="admin">
-              <AdminAnalytics />
+              <AdminLayout title="Analytics">
+                <AdminAnalytics />
+              </AdminLayout>
             </ProtectedRoute>
           }
         />

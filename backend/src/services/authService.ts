@@ -8,6 +8,12 @@ import { emailUtils } from '../utils/emailUtils';
 
 export class AuthService {
   /**
+   * Convert database role (uppercase) to JWT role (lowercase)
+   */
+  private static normalizeRole(dbRole: string): 'admin' | 'user' {
+    return dbRole.toLowerCase() as 'admin' | 'user';
+  }
+  /**
    * Register a new user
    */
   static async register(input: RegisterInput): Promise<{ user: any; tokens: TokenPair }> {
@@ -46,7 +52,7 @@ export class AuthService {
       const tokens = CryptoUtils.generateTokens({
         userId: user.id,
         email: user.email,
-        role: user.role
+        role: this.normalizeRole(user.role)
       });
 
       // Create session
@@ -113,7 +119,7 @@ export class AuthService {
       const tokens = CryptoUtils.generateTokens({
         userId: user.id,
         email: user.email,
-        role: user.role
+        role: this.normalizeRole(user.role)
       });
 
       // Update last login
@@ -140,7 +146,7 @@ export class AuthService {
           email: user.email,
           firstName: user.firstName,
           lastName: user.lastName,
-          role: user.role
+          role: this.normalizeRole(user.role)
         },
         tokens
       };
@@ -172,7 +178,7 @@ export class AuthService {
       const tokens = CryptoUtils.generateTokens({
         userId: user.id,
         email: user.email,
-        role: user.role
+        role: this.normalizeRole(user.role)
       });
 
       // Create new session

@@ -127,20 +127,42 @@ export const HomePage: React.FC = () => {
         </script>
       </Helmet>
 
-      <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gradient-to-br from-gray-50 to-gray-100'}`}>
+      <div className={`min-h-screen ${darkMode ? 'bg-gray-950' : 'bg-gradient-to-br from-blue-50 via-white to-purple-50'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Hero Section */}
-          <div className="text-center mb-12">
-            <h1 className={`text-4xl md:text-5xl font-bold mb-4 ${
-              darkMode ? 'text-white' : 'text-gray-900'
+          <div className="text-center mb-16 animate-fade-in-up">
+            <div className="inline-block mb-4">
+              <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-sm font-medium">
+                🚀 Fast & Secure Conversion
+              </span>
+            </div>
+            <h1 className={`text-5xl md:text-7xl font-bold mb-6 bg-clip-text text-transparent bg-gradient-to-r ${
+              darkMode 
+                ? 'from-blue-400 via-purple-400 to-pink-400' 
+                : 'from-blue-600 via-purple-600 to-pink-600'
             }`}>
               Universal File Converter
             </h1>
-            <p className={`text-lg md:text-xl ${
-              darkMode ? 'text-gray-400' : 'text-gray-600'
+            <p className={`text-xl md:text-2xl max-w-3xl mx-auto leading-relaxed ${
+              darkMode ? 'text-gray-300' : 'text-gray-700'
             }`}>
-              Seamlessly convert between CSV, JSON, XML, YAML, and more. Fast, secure, and browser-based.
+              Seamlessly convert between <span className="font-semibold text-primary-600 dark:text-primary-400">CSV, JSON, XML, YAML</span>, and more. 
+              <br className="hidden md:block" />Fast, secure, and browser-based.
             </p>
+            <div className="flex items-center justify-center gap-4 mt-8">
+              <div className={`flex items-center gap-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <span className="text-green-500">✓</span>
+                <span className="text-sm">No Upload Required</span>
+              </div>
+              <div className={`flex items-center gap-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <span className="text-green-500">✓</span>
+                <span className="text-sm">100% Privacy</span>
+              </div>
+              <div className={`flex items-center gap-2 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                <span className="text-green-500">✓</span>
+                <span className="text-sm">Lightning Fast</span>
+              </div>
+            </div>
           </div>
 
           {/* Alerts */}
@@ -148,15 +170,17 @@ export const HomePage: React.FC = () => {
           {success && <SuccessAlert message={success} onDismiss={() => setSuccess('')} />}
 
           {/* Main Content Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 pb-8">
             {/* Input Section */}
-            <div className={`rounded-xl overflow-hidden shadow-lg flex flex-col ${
-              darkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white'
+            <div className={`rounded-2xl overflow-hidden shadow-2xl flex flex-col backdrop-blur-sm transition-all duration-300 hover:shadow-glow ${
+              darkMode ? 'bg-gray-900/80 border border-gray-700' : 'bg-white/80 border border-gray-200'
             }`}>
-              <div className={`px-6 py-4 border-b ${
-                darkMode ? 'bg-gradient-to-r from-blue-600 to-blue-500 border-gray-800' : 'bg-gradient-to-r from-blue-600 to-blue-500'
-              }`}>
-                <h2 className="text-xl font-bold text-white">📥 Input</h2>
+              <div className="px-6 py-5 bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 relative overflow-hidden">
+                <div className="absolute inset-0 bg-shimmer animate-shimmer opacity-30"></div>
+                <h2 className="text-xl font-bold text-white flex items-center gap-2 relative z-10">
+                  <span className="text-2xl">📥</span>
+                  <span>Input</span>
+                </h2>
               </div>
               
               <div className="p-6 flex flex-col gap-4 flex-1">
@@ -216,13 +240,15 @@ export const HomePage: React.FC = () => {
             </div>
 
             {/* Output Section */}
-            <div className={`rounded-xl overflow-hidden shadow-lg flex flex-col ${
-              darkMode ? 'bg-gray-900 border border-gray-800' : 'bg-white'
+            <div className={`rounded-2xl overflow-hidden shadow-2xl flex flex-col backdrop-blur-sm transition-all duration-300 hover:shadow-glow ${
+              darkMode ? 'bg-gray-900/80 border border-gray-700' : 'bg-white/80 border border-gray-200'
             }`}>
-              <div className={`px-6 py-4 border-b ${
-                darkMode ? 'bg-gradient-to-r from-green-600 to-emerald-500 border-gray-800' : 'bg-gradient-to-r from-green-600 to-emerald-500'
-              }`}>
-                <h2 className="text-xl font-bold text-white">📤 Output</h2>
+              <div className="px-6 py-5 bg-gradient-to-r from-green-600 via-emerald-500 to-teal-500 relative overflow-hidden">
+                <div className="absolute inset-0 bg-shimmer animate-shimmer opacity-30"></div>
+                <h2 className="text-xl font-bold text-white flex items-center gap-2 relative z-10">
+                  <span className="text-2xl">📤</span>
+                  <span>Output</span>
+                </h2>
               </div>
               
               <div className="p-6 flex flex-col gap-4 flex-1">
@@ -270,6 +296,52 @@ export const HomePage: React.FC = () => {
                     <FaCopy /> Copy
                   </Button>
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Features Section */}
+          <div className="mt-20 mb-12">
+            <h2 className={`text-3xl md:text-4xl font-bold text-center mb-12 ${
+              darkMode ? 'text-white' : 'text-gray-900'
+            }`}>
+              Why Choose Our Converter?
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className={`p-8 rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${
+                darkMode ? 'bg-gray-900/50 border border-gray-800' : 'bg-white/50 border border-gray-200'
+              }`}>
+                <div className="text-4xl mb-4">🔒</div>
+                <h3 className={`text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  100% Secure
+                </h3>
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  All conversions happen locally in your browser. Your data never leaves your device.
+                </p>
+              </div>
+              
+              <div className={`p-8 rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${
+                darkMode ? 'bg-gray-900/50 border border-gray-800' : 'bg-white/50 border border-gray-200'
+              }`}>
+                <div className="text-4xl mb-4">⚡</div>
+                <h3 className={`text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Lightning Fast
+                </h3>
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Instant conversion with optimized algorithms. No waiting, no server delays.
+                </p>
+              </div>
+              
+              <div className={`p-8 rounded-2xl transition-all duration-300 hover:-translate-y-2 hover:shadow-xl ${
+                darkMode ? 'bg-gray-900/50 border border-gray-800' : 'bg-white/50 border border-gray-200'
+              }`}>
+                <div className="text-4xl mb-4">🎯</div>
+                <h3 className={`text-xl font-bold mb-3 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
+                  Multiple Formats
+                </h3>
+                <p className={`${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+                  Support for CSV, JSON, XML, YAML, and more. One tool for all your conversion needs.
+                </p>
               </div>
             </div>
           </div>

@@ -1,28 +1,29 @@
 #!/bin/bash
 
-# Script to set GitHub Codespaces ports to public
-# Run this if you're getting Network Error or CORS issues
+# This script has been integrated into dev.sh
+# The new dev.sh automatically configures Codespaces ports
 
-echo "Setting GitHub Codespaces ports to PUBLIC..."
+echo "⚠️  This script is no longer needed!"
 echo ""
-echo "⚠️  IMPORTANT: This must be done in VS Code UI"
+echo "The dev.sh script now automatically:"
+echo "  • Detects GitHub Codespaces environment"
+echo "  • Configures port visibility"
+echo "  • Sets up correct URLs for frontend/backend"
 echo ""
-echo "Steps to fix the Network Error:"
+echo "Just run: bash dev.sh"
 echo ""
-echo "1. Look at the bottom of VS Code"
-echo "2. Click on the 'PORTS' tab (next to TERMINAL)"
-echo "3. Find port 3000 (Backend API)"
-echo "4. Right-click → 'Port Visibility' → Select 'Public'"
-echo "5. Find port 5173 (Frontend)"
-echo "6. Right-click → 'Port Visibility' → Select 'Public'"
+echo "If you still have port issues, you can manually set ports:"
 echo ""
-echo "OR:"
+echo "1. Open VS Code PORTS tab (bottom panel)"
+echo "2. Find ports 3000 and 5173"
+echo "3. Right-click each → Port Visibility → Public"
 echo ""
-echo "1. In the PORTS tab"
-echo "2. Click the 🔒 lock icon next to each port"
-echo "3. Change it to 🌐 (public)"
+echo "Or use GitHub CLI:"
+echo "  gh codespace ports visibility 3000:public"
+echo "  gh codespace ports visibility 5173:public"
 echo ""
-echo "After changing to public, refresh your frontend page!"
-echo ""
-echo "Current port status:"
-gh codespace ports 2>/dev/null || echo "  (GitHub CLI not available)"
+
+if command -v gh >/dev/null 2>&1; then
+    echo "Current port status:"
+    gh codespace ports 2>/dev/null || echo "  (Not in a Codespace)"
+fi

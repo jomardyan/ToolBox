@@ -10,8 +10,32 @@ import {
   validateFilterOptions,
   sanitizeErrorMessage,
 } from '../utils/validation';
+import authRoutes from './authRoutes';
+import apiKeyRoutes from './apiKeyRoutes';
+import usageRoutes from './usageRoutes';
+import subscriptionRoutes from './subscriptionRoutes';
+import billingRoutes from './billingRoutes';
+import accountRoutes from './accountRoutes';
+import adminUsersRoutes from './admin/usersRoutes';
+import adminPlansRoutes from './admin/plansRoutes';
+import adminAnalyticsRoutes from './admin/analyticsRoutes';
 
 const router = Router();
+
+// Mount auth routes
+router.use('/auth', authRoutes);
+
+// Mount user routes (protected)
+router.use('/user', apiKeyRoutes);
+router.use('/user/usage', usageRoutes);
+router.use('/subscription', subscriptionRoutes);
+router.use('/billing', billingRoutes);
+router.use('/account', accountRoutes);
+
+// Mount admin routes (protected + admin role required)
+router.use('/admin/users', adminUsersRoutes);
+router.use('/admin/plans', adminPlansRoutes);
+router.use('/admin/analytics', adminAnalyticsRoutes);
 
 /**
  * @swagger

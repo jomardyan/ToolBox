@@ -30,7 +30,7 @@ export class AuditService {
           action: input.action,
           resourceType: input.resourceType,
           resourceId: input.resourceId,
-          changes: input.changes || {},
+          changes: input.changes ? JSON.stringify(input.changes) : null,
           ipAddress: input.ipAddress,
           userAgent: input.userAgent,
           timestamp: new Date()
