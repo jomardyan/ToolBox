@@ -137,7 +137,7 @@ export const AdminUsers: React.FC = () => {
         )}
 
         {/* Search and Stats */}
-        <div className="bg-white rounded-lg shadow p-6">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold">Total Users: {filteredUsers.length}</h3>
             <input
@@ -148,17 +148,17 @@ export const AdminUsers: React.FC = () => {
                 setSearchTerm(e.target.value);
                 setCurrentPage(1);
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
         </div>
 
         {/* Users Table */}
-        <div className="bg-white rounded-lg shadow overflow-hidden">
+        <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
           {loading ? (
-            <div className="p-8 text-center text-gray-500">Loading users...</div>
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">Loading users...</div>
           ) : filteredUsers.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">No users found</div>
+            <div className="p-8 text-center text-gray-500 dark:text-gray-400">No users found</div>
           ) : (
             <>
               <div className="overflow-x-auto">
@@ -270,14 +270,14 @@ export const AdminUsers: React.FC = () => {
                     <button
                       onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
                       disabled={currentPage === 1}
-                      className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50"
+                      className="px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded disabled:opacity-50"
                     >
                       Previous
                     </button>
                     <button
                       onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
                       disabled={currentPage === totalPages}
-                      className="px-3 py-1 border border-gray-300 rounded disabled:opacity-50"
+                      className="px-3 py-1 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded disabled:opacity-50"
                     >
                       Next
                     </button>

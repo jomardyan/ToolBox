@@ -77,7 +77,7 @@ export const AdminAnalytics: React.FC = () => {
     return (
       <AdminLayout title="Analytics Dashboard">
         <div className="flex justify-center items-center h-96">
-          <div className="text-gray-500">Loading analytics...</div>
+          <div className="text-gray-500 dark:text-gray-400">Loading analytics...</div>
         </div>
       </AdminLayout>
     );
@@ -95,25 +95,25 @@ export const AdminAnalytics: React.FC = () => {
         {/* Revenue Overview Cards */}
         {revenueData && (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="text-sm font-semibold text-gray-600">MRR</h3>
               <p className="text-3xl font-bold text-blue-600 mt-2">
                 ${revenueData.mrr.toFixed(2)}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="text-sm font-semibold text-gray-600">Total Revenue</h3>
               <p className="text-3xl font-bold text-green-600 mt-2">
                 ${revenueData.totalRevenue.toFixed(2)}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="text-sm font-semibold text-gray-600">Active Subscriptions</h3>
               <p className="text-3xl font-bold text-purple-600 mt-2">
                 {revenueData.activeSubscriptions}
               </p>
             </div>
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="text-sm font-semibold text-gray-600">Churn Rate</h3>
               <p className="text-3xl font-bold text-red-600 mt-2">
                 {revenueData.churnRate.toFixed(2)}%
@@ -124,7 +124,7 @@ export const AdminAnalytics: React.FC = () => {
 
         {/* Revenue Trend Chart */}
         {revenueChartData.length > 0 && (
-          <div className="bg-white rounded-lg shadow p-6">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
             <h3 className="text-lg font-semibold mb-4">Revenue Trend</h3>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={revenueChartData}>
@@ -150,19 +150,19 @@ export const AdminAnalytics: React.FC = () => {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* User Cards */}
             <div className="space-y-4">
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 className="text-sm font-semibold text-gray-600">Total Users</h3>
                 <p className="text-3xl font-bold text-blue-600 mt-2">
                   {userAnalytics.totalUsers}
                 </p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 className="text-sm font-semibold text-gray-600">Active Users (30d)</h3>
                 <p className="text-3xl font-bold text-green-600 mt-2">
                   {userAnalytics.activeUsers}
                 </p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 className="text-sm font-semibold text-gray-600">New Users (This Month)</h3>
                 <p className="text-3xl font-bold text-purple-600 mt-2">
                   {userAnalytics.newUsersThisMonth}
@@ -171,7 +171,7 @@ export const AdminAnalytics: React.FC = () => {
             </div>
 
             {/* Usage Distribution Pie */}
-            <div className="bg-white rounded-lg shadow p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold mb-4">Usage Distribution</h3>
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
@@ -216,25 +216,25 @@ export const AdminAnalytics: React.FC = () => {
           <div className="space-y-6">
             {/* API Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 className="text-sm font-semibold text-gray-600">Total API Calls</h3>
                 <p className="text-3xl font-bold text-blue-600 mt-2">
                   {apiData.totalApiCalls.toLocaleString()}
                 </p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 className="text-sm font-semibold text-gray-600">Error Rate</h3>
                 <p className="text-3xl font-bold text-red-600 mt-2">
                   {apiData.errorRate.toFixed(2)}%
                 </p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 className="text-sm font-semibold text-gray-600">Avg Response Time</h3>
                 <p className="text-3xl font-bold text-green-600 mt-2">
                   {apiData.avgResponseTime}ms
                 </p>
               </div>
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 className="text-sm font-semibold text-gray-600">P95 Response Time</h3>
                 <p className="text-3xl font-bold text-purple-600 mt-2">
                   {apiData.p95ResponseTime}ms
@@ -244,7 +244,7 @@ export const AdminAnalytics: React.FC = () => {
 
             {/* Top Errors */}
             {apiData.topErrors.length > 0 && (
-              <div className="bg-white rounded-lg shadow p-6">
+              <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                 <h3 className="text-lg font-semibold mb-4">Top Errors</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart

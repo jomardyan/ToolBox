@@ -123,14 +123,14 @@ export const AdminPlans: React.FC = () => {
     <AdminLayout title="Plans Management">
       <div className="space-y-6">
         {error && (
-          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+          <div className="bg-red-50 dark:bg-red-950 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-300 px-4 py-3 rounded">
             {error}
           </div>
         )}
 
         {/* Create Button */}
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold">Pricing Plans</h2>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Pricing Plans</h2>
           <button
             onClick={() => {
               setShowForm(!showForm);
@@ -145,26 +145,26 @@ export const AdminPlans: React.FC = () => {
 
         {/* Form */}
         {showForm && (
-          <div className="bg-white rounded-lg shadow p-6">
-            <h3 className="text-lg font-semibold mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+            <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
               {editingId ? 'Edit Plan' : 'Create New Plan'}
             </h3>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
                     Plan Name
                   </label>
                   <input
                     type="text"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
                     Plan Type
                   </label>
                   <select
@@ -172,7 +172,7 @@ export const AdminPlans: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, type: e.target.value as any })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="SUBSCRIPTION">Subscription</option>
                     <option value="PAY_AS_YOU_GO">Pay-As-You-Go</option>
@@ -182,7 +182,7 @@ export const AdminPlans: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
                   Description
                 </label>
                 <textarea
@@ -191,13 +191,13 @@ export const AdminPlans: React.FC = () => {
                     setFormData({ ...formData, description: e.target.value })
                   }
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
                     Price
                   </label>
                   <input
@@ -207,11 +207,11 @@ export const AdminPlans: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, price: parseFloat(e.target.value) })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
                     Rate Limit (req/min)
                   </label>
                   <input
@@ -220,11 +220,11 @@ export const AdminPlans: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, rateLimit: parseInt(e.target.value) })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                  <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
                     Max API Keys
                   </label>
                   <input
@@ -233,13 +233,13 @@ export const AdminPlans: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, maxApiKeys: parseInt(e.target.value) })
                     }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1">
+                <label className="block text-sm font-semibold text-gray-900 dark:text-gray-100 mb-1">
                   Monthly Limit (null = unlimited)
                 </label>
                 <input
@@ -252,7 +252,7 @@ export const AdminPlans: React.FC = () => {
                     })
                   }
                   placeholder="Leave empty for unlimited"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                 />
               </div>
 
@@ -264,7 +264,7 @@ export const AdminPlans: React.FC = () => {
                     setEditingId(null);
                     setFormData(initialFormData);
                   }}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="px-4 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-900 text-gray-900 dark:text-white rounded-lg hover:bg-gray-50"
                 >
                   Cancel
                 </button>
@@ -283,18 +283,18 @@ export const AdminPlans: React.FC = () => {
         {/* Plans Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
-            <div className="col-span-full text-center py-8 text-gray-500">
+            <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
               Loading plans...
             </div>
           ) : plans.length === 0 ? (
-            <div className="col-span-full text-center py-8 text-gray-500">
+            <div className="col-span-full text-center py-8 text-gray-500 dark:text-gray-400">
               No plans found. Create one to get started.
             </div>
           ) : (
             plans.map((plan) => (
               <div
                 key={plan.id}
-                className="bg-white rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
+                className="bg-white dark:bg-gray-800 rounded-lg shadow p-6 hover:shadow-lg transition-shadow"
               >
                 <div className="mb-4">
                   <h3 className="text-xl font-bold text-gray-900">{plan.name}</h3>

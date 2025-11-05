@@ -63,6 +63,14 @@ export const Header: React.FC = () => {
             >
               Advanced
             </Link>
+            <Link 
+              to="/faq" 
+              className={`font-medium transition-colors hover:text-blue-600 ${
+                darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700'
+              }`}
+            >
+              FAQ
+            </Link>
             
             {/* Auth Buttons */}
             <div className="flex items-center gap-4 pl-4 border-l" style={{ borderColor: darkMode ? '#374151' : '#e5e7eb' }}>
@@ -185,6 +193,15 @@ export const Header: React.FC = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               Advanced
+            </Link>
+            <Link 
+              to="/faq" 
+              className={`block py-2 font-medium transition-colors hover:text-blue-600 ${
+                darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700'
+              }`}
+              onClick={() => setIsMenuOpen(false)}
+            >
+              FAQ
             </Link>
             
             {/* Mobile Auth Buttons */}

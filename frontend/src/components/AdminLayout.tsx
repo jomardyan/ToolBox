@@ -96,7 +96,7 @@ export const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title }) => 
             <div className="flex items-center gap-4">
               <div className="text-right">
                 <p className="text-sm font-semibold text-gray-800">{user?.firstName} {user?.lastName}</p>
-                <p className="text-xs text-gray-500">{user?.role}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">{user?.role}</p>
               </div>
               <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white font-bold">
                 {user?.email?.[0]?.toUpperCase()}

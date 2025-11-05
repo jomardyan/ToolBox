@@ -123,31 +123,31 @@ export const BatchProcessor: React.FC = () => {
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Batch Processor</h2>
 
       {/* Add Item Form */}
-      <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
-        <h3 className="font-semibold mb-4 text-gray-800 dark:text-gray-200">Add Conversion Item</h3>
+      <div className="mb-6 p-6 bg-gray-100 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+        <h3 className="font-semibold mb-4 text-xl text-gray-900 dark:text-gray-100">Add Conversion Item</h3>
 
         <div className="mb-4">
-          <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+          <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
             Data to Convert
           </label>
           <textarea
             value={newItemData}
             onChange={e => setNewItemData(e.target.value)}
             placeholder="Paste your data here..."
-            className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded"
+            className="w-full p-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             rows={4}
           />
         </div>
 
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
               From Format
             </label>
             <select
               value={newItemSourceFormat}
               onChange={e => setNewItemSourceFormat(e.target.value as SupportedFormat)}
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded"
+              className="w-full p-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
               {FORMATS.map(fmt => (
                 <option key={fmt} value={fmt}>
@@ -158,13 +158,13 @@ export const BatchProcessor: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-sm font-medium text-gray-900 dark:text-gray-100 mb-2">
               To Format
             </label>
             <select
               value={newItemTargetFormat}
               onChange={e => setNewItemTargetFormat(e.target.value as SupportedFormat)}
-              className="w-full p-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-600 dark:text-white rounded"
+              className="w-full p-3 border-2 border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
             >
               {FORMATS.map(fmt => (
                 <option key={fmt} value={fmt}>
@@ -184,7 +184,7 @@ export const BatchProcessor: React.FC = () => {
       {items.length > 0 && (
         <div className="mb-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="font-semibold text-gray-800 dark:text-gray-200">
+            <h3 className="font-semibold text-lg text-gray-900 dark:text-gray-100">
               Queued Items ({items.length})
             </h3>
             <div className="space-x-2">
@@ -215,38 +215,38 @@ export const BatchProcessor: React.FC = () => {
             {items.map((item, index) => (
               <div
                 key={item.id}
-                className={`p-4 rounded border-l-4 ${
+                className={`p-4 rounded-lg border-l-4 ${
                   item.status === 'pending'
-                    ? 'border-gray-400 bg-gray-50 dark:bg-gray-700'
+                    ? 'border-gray-500 bg-gray-50 dark:bg-gray-800 dark:border-gray-400'
                     : item.status === 'processing'
-                      ? 'border-blue-400 bg-blue-50 dark:bg-blue-900'
+                      ? 'border-blue-500 bg-blue-50 dark:bg-blue-950 dark:border-blue-400'
                       : item.status === 'success'
-                        ? 'border-green-400 bg-green-50 dark:bg-green-900'
-                        : 'border-red-400 bg-red-50 dark:bg-red-900'
+                        ? 'border-green-500 bg-green-50 dark:bg-green-950 dark:border-green-400'
+                        : 'border-red-500 bg-red-50 dark:bg-red-950 dark:border-red-400'
                 }`}
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
                       Item {index + 1}: {item.sourceFormat.toUpperCase()} → {item.targetFormat.toUpperCase()}
                     </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate">
+                    <p className="text-xs text-gray-600 dark:text-gray-300 mt-1 truncate">
                       {item.data.substring(0, 60)}...
                     </p>
                     {item.error && (
-                      <p className="text-xs text-red-600 dark:text-red-400 mt-1">
+                      <p className="text-xs text-red-700 dark:text-red-300 mt-1 font-medium">
                         Error: {item.error}
                       </p>
                     )}
                   </div>
                   <div className="flex items-center space-x-2 ml-4">
-                    <span className="text-xs font-semibold text-gray-600 dark:text-gray-400">
+                    <span className="text-xs font-semibold px-2 py-1 rounded bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-gray-100">
                       {item.status.toUpperCase()}
                     </span>
                     {item.status === 'pending' && (
                       <button
                         onClick={() => removeItem(item.id)}
-                        className="text-red-500 hover:text-red-700 text-sm"
+                        className="text-red-600 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm font-medium"
                       >
                         Remove
                       </button>
@@ -260,7 +260,7 @@ export const BatchProcessor: React.FC = () => {
       )}
 
       {items.length === 0 && (
-        <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+        <div className="text-center py-8 text-gray-600 dark:text-gray-300">
           <p>No items queued. Add items above to get started.</p>
         </div>
       )}

@@ -5,6 +5,7 @@ import { RegisterPage } from './pages/RegisterPage';
 import { HomePage } from './pages/HomePage';
 import { HistoryPage } from './pages/HistoryPage';
 import { AdvancedFeaturesPage } from './pages/AdvancedFeaturesPage';
+import { FAQPage } from './pages/FAQPage';
 import { DashboardLayout } from './components/DashboardLayout';
 import { DashboardPage } from './pages/DashboardPage';
 import { ApiKeysPage } from './pages/ApiKeysPage';
@@ -26,6 +27,7 @@ function App() {
         <Route path="/" element={<HomePage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/advanced" element={<AdvancedFeaturesPage />} />
+        <Route path="/faq" element={<FAQPage />} />
 
         {/* Auth Routes */}
         <Route path="/login" element={<LoginPage />} />
