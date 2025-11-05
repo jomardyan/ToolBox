@@ -1,0 +1,138 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e5]:
+      - link "📊 ToolBox Convert any format" [active] [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: 📊
+        - generic [ref=e8]:
+          - generic [ref=e9]: ToolBox
+          - text: Convert any format
+      - navigation [ref=e10]:
+        - link "Home" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "History" [ref=e12] [cursor=pointer]:
+          - /url: /history
+        - link "Advanced" [ref=e13] [cursor=pointer]:
+          - /url: /advanced
+        - link "FAQ" [ref=e14] [cursor=pointer]:
+          - /url: /faq
+        - generic [ref=e15]:
+          - button "Toggle dark mode" [ref=e16] [cursor=pointer]: 🌙
+          - link "Login" [ref=e17] [cursor=pointer]:
+            - /url: /login
+          - link "Sign Up" [ref=e18] [cursor=pointer]:
+            - /url: /register
+  - generic [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e23]: 🚀 Fast & Secure Conversion
+      - heading "Universal File Converter" [level=1] [ref=e24]
+      - paragraph [ref=e25]:
+        - text: Seamlessly convert between CSV, JSON, XML, YAML, and more.
+        - text: Fast, secure, and browser-based.
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - generic [ref=e28]: ✓
+          - generic [ref=e29]: No Upload Required
+        - generic [ref=e30]:
+          - generic [ref=e31]: ✓
+          - generic [ref=e32]: 100% Privacy
+        - generic [ref=e33]:
+          - generic [ref=e34]: ✓
+          - generic [ref=e35]: Lightning Fast
+    - generic [ref=e36]:
+      - generic [ref=e37]:
+        - heading "📥 Input" [level=2] [ref=e40]:
+          - generic [ref=e41]: 📥
+          - generic [ref=e42]: Input
+        - generic [ref=e43]:
+          - generic [ref=e45]:
+            - generic [ref=e46]: Source Format
+            - generic [ref=e47]:
+              - button "CSV" [ref=e48] [cursor=pointer]
+              - button "JSON" [ref=e49] [cursor=pointer]
+              - button "XML" [ref=e50] [cursor=pointer]
+              - button "YAML" [ref=e51] [cursor=pointer]
+              - button "HTML" [ref=e52] [cursor=pointer]
+              - button "TABLE" [ref=e53] [cursor=pointer]
+              - button "TSV" [ref=e54] [cursor=pointer]
+              - button "KML" [ref=e55] [cursor=pointer]
+              - button "TXT" [ref=e56] [cursor=pointer]
+              - button "MARKDOWN" [ref=e57] [cursor=pointer]
+              - button "JSONL" [ref=e58] [cursor=pointer]
+              - button "NDJSON" [ref=e59] [cursor=pointer]
+              - button "LINES" [ref=e60] [cursor=pointer]
+              - button "ICS" [ref=e61] [cursor=pointer]
+              - button "TOML" [ref=e62] [cursor=pointer]
+              - button "EXCEL" [ref=e63] [cursor=pointer]
+              - button "SQL" [ref=e64] [cursor=pointer]
+          - generic [ref=e65]:
+            - generic [ref=e66]: Upload or Paste Data
+            - generic [ref=e67] [cursor=pointer]:
+              - generic [ref=e68]: 📁
+              - heading "Drag and drop your file" [level=5] [ref=e69]
+              - paragraph [ref=e70]: or click to browse your computer
+              - generic [ref=e71]: "Max size: 100MB"
+          - generic [ref=e72]:
+            - generic [ref=e73]: "Or paste your data:"
+            - textbox "Paste your data here..." [ref=e74]
+          - generic [ref=e75]:
+            - button "Convert" [ref=e76] [cursor=pointer]:
+              - img [ref=e77]
+              - text: Convert
+            - button "Clear" [disabled] [ref=e79]:
+              - img [ref=e80]
+              - text: Clear
+      - generic [ref=e82]:
+        - heading "📤 Output" [level=2] [ref=e85]:
+          - generic [ref=e86]: 📤
+          - generic [ref=e87]: Output
+        - generic [ref=e88]:
+          - generic [ref=e90]:
+            - generic [ref=e91]: Target Format
+            - generic [ref=e92]:
+              - button "CSV" [ref=e93] [cursor=pointer]
+              - button "JSON" [ref=e94] [cursor=pointer]
+              - button "XML" [ref=e95] [cursor=pointer]
+              - button "YAML" [ref=e96] [cursor=pointer]
+              - button "HTML" [ref=e97] [cursor=pointer]
+              - button "TABLE" [ref=e98] [cursor=pointer]
+              - button "TSV" [ref=e99] [cursor=pointer]
+              - button "KML" [ref=e100] [cursor=pointer]
+              - button "TXT" [ref=e101] [cursor=pointer]
+              - button "MARKDOWN" [ref=e102] [cursor=pointer]
+              - button "JSONL" [ref=e103] [cursor=pointer]
+              - button "NDJSON" [ref=e104] [cursor=pointer]
+              - button "LINES" [ref=e105] [cursor=pointer]
+              - button "ICS" [ref=e106] [cursor=pointer]
+              - button "TOML" [ref=e107] [cursor=pointer]
+              - button "EXCEL" [ref=e108] [cursor=pointer]
+              - button "SQL" [ref=e109] [cursor=pointer]
+          - generic [ref=e110]:
+            - generic [ref=e111]: Converted Result
+            - textbox "Your converted data will appear here..." [ref=e112]
+          - generic [ref=e113]:
+            - button "Download" [disabled] [ref=e114]:
+              - img [ref=e115]
+              - text: Download
+            - button "Copy" [disabled] [ref=e117]:
+              - img [ref=e118]
+              - text: Copy
+    - generic [ref=e120]:
+      - heading "Why Choose Our Converter?" [level=2] [ref=e121]
+      - generic [ref=e122]:
+        - generic [ref=e123]:
+          - generic [ref=e124]: 🔒
+          - heading "100% Secure" [level=3] [ref=e125]
+          - paragraph [ref=e126]: All conversions happen locally in your browser. Your data never leaves your device.
+        - generic [ref=e127]:
+          - generic [ref=e128]: ⚡
+          - heading "Lightning Fast" [level=3] [ref=e129]
+          - paragraph [ref=e130]: Instant conversion with optimized algorithms. No waiting, no server delays.
+        - generic [ref=e131]:
+          - generic [ref=e132]: 🎯
+          - heading "Multiple Formats" [level=3] [ref=e133]
+          - paragraph [ref=e134]: Support for CSV, JSON, XML, YAML, and more. One tool for all your conversion needs.
+```

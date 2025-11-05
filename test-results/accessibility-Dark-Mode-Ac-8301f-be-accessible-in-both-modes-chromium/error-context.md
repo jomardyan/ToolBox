@@ -1,0 +1,63 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e5]:
+      - link "📊 ToolBox Convert any format" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: 📊
+        - generic [ref=e8]:
+          - generic [ref=e9]: ToolBox
+          - text: Convert any format
+      - navigation [ref=e10]:
+        - link "Home" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "History" [ref=e12] [cursor=pointer]:
+          - /url: /history
+        - link "Advanced" [ref=e13] [cursor=pointer]:
+          - /url: /advanced
+        - link "FAQ" [ref=e14] [cursor=pointer]:
+          - /url: /faq
+        - generic [ref=e15]:
+          - button "Toggle dark mode" [ref=e16] [cursor=pointer]: 🌙
+          - link "Login" [ref=e17] [cursor=pointer]:
+            - /url: /login
+          - link "Sign Up" [ref=e18] [cursor=pointer]:
+            - /url: /register
+  - generic [ref=e20]:
+    - generic [ref=e21]:
+      - generic [ref=e24]:
+        - img [ref=e26]
+        - heading "Welcome Back" [level=2] [ref=e28]
+        - paragraph [ref=e29]: Sign in to your account
+      - generic [ref=e30]:
+        - generic [ref=e31]:
+          - generic [ref=e32]:
+            - generic [ref=e33]: Email Address
+            - generic [ref=e34]:
+              - generic:
+                - img
+              - textbox "you@example.com" [ref=e35]
+          - generic [ref=e36]:
+            - generic [ref=e37]: Password
+            - generic [ref=e38]:
+              - generic:
+                - img
+              - textbox "••••••••" [ref=e39]
+          - generic [ref=e40]:
+            - generic [ref=e41] [cursor=pointer]:
+              - checkbox "Remember me" [ref=e42]
+              - text: Remember me
+            - link "Forgot password?" [ref=e43] [cursor=pointer]:
+              - /url: /forgot-password
+          - button "Sign In" [ref=e44] [cursor=pointer]:
+            - img [ref=e45]
+            - generic [ref=e47]: Sign In
+        - paragraph [ref=e49]:
+          - text: Don't have an account?
+          - link "Sign up for free" [ref=e50] [cursor=pointer]:
+            - /url: /register
+    - link "← Back to home" [ref=e52] [cursor=pointer]:
+      - /url: /
+```

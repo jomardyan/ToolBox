@@ -10,6 +10,11 @@
     "install:all": "npm install && cd backend && npm install && cd ../frontend && npm install",
     "build:all": "cd backend && npm run build && cd ../frontend && npm run build",
     "test:backend": "cd backend && npm test",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:e2e:headed": "playwright test --headed",
+    "test:e2e:debug": "playwright test --debug",
+    "test:e2e:report": "playwright show-report",
     "lint:backend": "cd backend && npm run lint",
     "docker:up": "docker-compose up --build",
     "docker:down": "docker-compose down",
@@ -30,5 +35,8 @@
   "engines": {
     "node": ">=20.0.0",
     "npm": ">=9.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.56.1"
   }
 }

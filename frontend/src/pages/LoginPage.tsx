@@ -95,7 +95,7 @@ export const LoginPage = () => {
 
             <form className="space-y-6" onSubmit={handleSubmit}>
               <div>
-                <label className={`block text-sm font-semibold mb-2 ${
+                <label htmlFor="email" className={`block text-sm font-semibold mb-2 ${
                   darkMode ? 'text-gray-300' : 'text-gray-700'
                 }`}>
                   Email Address
@@ -105,10 +105,12 @@ export const LoginPage = () => {
                     <FaEnvelope className={darkMode ? 'text-gray-500' : 'text-gray-400'} />
                   </div>
                   <input
+                    id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="you@example.com"
+                    aria-label="Email Address"
                     className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-4 ${
                       darkMode 
                         ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500/20' 
@@ -121,7 +123,7 @@ export const LoginPage = () => {
               </div>
 
               <div>
-                <label className={`block text-sm font-semibold mb-2 ${
+                <label htmlFor="password" className={`block text-sm font-semibold mb-2 ${
                   darkMode ? 'text-gray-300' : 'text-gray-700'
                 }`}>
                   Password
@@ -131,10 +133,12 @@ export const LoginPage = () => {
                     <FaLock className={darkMode ? 'text-gray-500' : 'text-gray-400'} />
                   </div>
                   <input
+                    id="password"
                     type="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••"
+                    aria-label="Password"
                     className={`w-full pl-12 pr-4 py-3 rounded-xl border-2 transition-all duration-200 focus:outline-none focus:ring-4 ${
                       darkMode 
                         ? 'bg-gray-800 border-gray-700 text-white placeholder-gray-500 focus:border-primary-500 focus:ring-primary-500/20' 

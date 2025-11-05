@@ -1,0 +1,118 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e5]:
+      - link "📊 ToolBox Convert any format" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: 📊
+        - generic [ref=e8]:
+          - generic [ref=e9]: ToolBox
+          - text: Convert any format
+      - navigation [ref=e10]:
+        - link "Home" [ref=e11] [cursor=pointer]:
+          - /url: /
+        - link "History" [ref=e12] [cursor=pointer]:
+          - /url: /history
+        - link "Advanced" [ref=e13] [cursor=pointer]:
+          - /url: /advanced
+        - link "FAQ" [ref=e14] [cursor=pointer]:
+          - /url: /faq
+        - generic [ref=e15]:
+          - button "Toggle dark mode" [active] [ref=e16] [cursor=pointer]: ☀️
+          - link "Login" [ref=e17] [cursor=pointer]:
+            - /url: /login
+          - link "Sign Up" [ref=e18] [cursor=pointer]:
+            - /url: /register
+  - generic [ref=e20]:
+    - generic [ref=e21]:
+      - heading "Advanced Features" [level=1] [ref=e22]
+      - paragraph [ref=e23]: Unlock powerful tools for batch processing and workflow automation
+    - generic [ref=e24]:
+      - button "Batch Processor" [ref=e25] [cursor=pointer]:
+        - img [ref=e26]
+        - generic [ref=e28]: Batch Processor
+      - button "Presets" [ref=e29] [cursor=pointer]:
+        - img [ref=e30]
+        - generic [ref=e34]: Presets
+    - generic [ref=e35]:
+      - generic [ref=e38]:
+        - heading "Batch Processor" [level=3] [ref=e39]
+        - generic [ref=e40]:
+          - heading "Batch Processor" [level=2] [ref=e41]
+          - generic [ref=e42]:
+            - heading "Add Conversion Item" [level=3] [ref=e43]
+            - generic [ref=e44]:
+              - generic [ref=e45]: Data to Convert
+              - textbox "Paste your data here..." [ref=e46]
+            - generic [ref=e47]:
+              - generic [ref=e48]:
+                - generic [ref=e49]: From Format
+                - combobox [ref=e50]:
+                  - option "CSV" [selected]
+                  - option "JSON"
+                  - option "XML"
+                  - option "YAML"
+                  - option "HTML"
+                  - option "TSV"
+                  - option "KML"
+                  - option "TXT"
+              - generic [ref=e51]:
+                - generic [ref=e52]: To Format
+                - combobox [ref=e53]:
+                  - option "CSV"
+                  - option "JSON" [selected]
+                  - option "XML"
+                  - option "YAML"
+                  - option "HTML"
+                  - option "TSV"
+                  - option "KML"
+                  - option "TXT"
+            - button "Add Item to Batch" [ref=e54] [cursor=pointer]
+          - paragraph [ref=e56]: No items queued. Add items above to get started.
+        - generic [ref=e57]:
+          - heading "When to Use Batch Processing" [level=5] [ref=e58]
+          - generic [ref=e59]:
+            - generic [ref=e60] [cursor=pointer]:
+              - heading "Data Migration" [level=5] [ref=e61]
+              - paragraph [ref=e62]: Convert hundreds of CSV files to JSON in one go
+            - generic [ref=e63] [cursor=pointer]:
+              - heading "Report Generation" [level=5] [ref=e64]
+              - paragraph [ref=e65]: Transform multiple data sources into standardized formats
+            - generic [ref=e66] [cursor=pointer]:
+              - heading "Automation" [level=5] [ref=e67]
+              - paragraph [ref=e68]: Integrate batch processing into your workflows
+      - generic [ref=e70]:
+        - generic [ref=e71]:
+          - heading "💡 Quick Tips" [level=5] [ref=e72]
+          - generic [ref=e73]:
+            - generic [ref=e74]:
+              - generic [ref=e75]: ✓
+              - generic [ref=e76]: Upload multiple files with the same source and target formats
+            - generic [ref=e77]:
+              - generic [ref=e78]: ✓
+              - generic [ref=e79]: Perfect for bulk conversions in workflows and automation
+            - generic [ref=e80]:
+              - generic [ref=e81]: ✓
+              - generic [ref=e82]: Monitor progress with real-time status updates
+        - generic [ref=e83]:
+          - heading "Key Benefits" [level=5] [ref=e84]
+          - generic [ref=e85]:
+            - generic [ref=e86]:
+              - generic [ref=e87]: ⚡
+              - heading "Lightning Fast" [level=6] [ref=e88]
+              - paragraph [ref=e89]: Process files in seconds
+            - generic [ref=e90]:
+              - generic [ref=e91]: 🔄
+              - heading "Flexible" [level=6] [ref=e92]
+              - paragraph [ref=e93]: Support for 10+ formats
+            - generic [ref=e94]:
+              - generic [ref=e95]: 💾
+              - heading "Save & Reuse" [level=6] [ref=e96]
+              - paragraph [ref=e97]: Presets for repeatability
+            - generic [ref=e98]:
+              - generic [ref=e99]: 📊
+              - heading "Real-time" [level=6] [ref=e100]
+              - paragraph [ref=e101]: Live progress tracking
+```

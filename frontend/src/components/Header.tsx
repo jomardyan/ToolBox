@@ -68,13 +68,21 @@ export const Header: React.FC = () => {
             <div className="flex items-center gap-4 pl-4 border-l" style={{ borderColor: darkMode ? '#374151' : '#e5e7eb' }}>
               <button
                 onClick={toggleDarkMode}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleDarkMode();
+                  }
+                }}
                 className={`p-2 rounded-lg transition-colors ${
                   darkMode 
                     ? 'bg-gray-800 hover:bg-gray-700 text-yellow-400' 
                     : 'bg-gray-200 hover:bg-gray-300 text-gray-800'
                 }`}
                 title={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
-                aria-label="Toggle dark mode"
+                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                role="switch"
+                aria-checked={darkMode}
               >
                 {darkMode ? '☀️' : '🌙'}
               </button>
@@ -195,6 +203,30 @@ export const Header: React.FC = () => {
             >
               FAQ
             </Link>
+            
+            {/* Mobile Dark Mode Toggle */}
+            <div className="py-2">
+              <button
+                onClick={toggleDarkMode}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    toggleDarkMode();
+                  }
+                }}
+                className={`w-full py-2 px-4 rounded-lg font-medium transition-colors flex items-center justify-between ${
+                  darkMode 
+                    ? 'bg-gray-800 hover:bg-gray-700 text-gray-300' 
+                    : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                }`}
+                aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
+                role="switch"
+                aria-checked={darkMode}
+              >
+                <span>Dark Mode</span>
+                <span className="text-xl">{darkMode ? '☀️' : '🌙'}</span>
+              </button>
+            </div>
             
             {/* Mobile Auth Buttons */}
             <div className="pt-4 mt-4 border-t" style={{ borderColor: darkMode ? '#374151' : '#e5e7eb' }}>
