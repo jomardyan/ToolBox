@@ -6,14 +6,33 @@ import { emailUtils } from '../../utils/emailUtils';
 import { authenticateToken } from '../../middleware/auth';
 import { AuditService } from '../../services/auditService';
 
-jest.mock('../../config/database');
+jest.mock('../../config/database', () => ({
+  prisma: {
+    user: {
+      findUnique: jest.fn(),
+      update: jest.fn(),
+      delete: jest.fn(),
+      findMany: jest.fn(),
+    },
+    auditLog: {
+      create: jest.fn(),
+    },
+    session: {
+      deleteMany: jest.fn(),
+    },
+  },
+}));
 jest.mock('../../utils/cryptoUtils');
 jest.mock('../../utils/emailUtils');
 jest.mock('../../services/auditService');
 jest.mock('../../middleware/auth', () => ({
   authenticateToken: jest.fn((req, res, next) => {
-    req.user = { userId: 'user_123', email: 'test@example.com', role: 'USER' };
-    next();
+    if (req) {
+      req.user = { userId: 'user_123', email: 'test@example.com', role: 'USER' };
+    }
+    if (next) {
+      next();
+    }
   }),
 }));
 

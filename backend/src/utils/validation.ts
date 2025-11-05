@@ -113,30 +113,34 @@ export function validateFilterOptions(filterOptions: any): boolean {
   if (!filterOptions) {
     return true; // Filter options are optional
   }
-  
-  if (typeof filterOptions !== 'object' || Array.isArray(filterOptions)) {
+
+  if (!Array.isArray(filterOptions)) {
     return false;
   }
-  
+
   const validOperators = ['equals', 'contains', 'startsWith', 'endsWith'];
-  
-  for (const key in filterOptions) {
-    const filter = filterOptions[key];
-    
-    if (!filter || typeof filter !== 'object') {
+
+  return filterOptions.every((filter) => {
+    if (!filter || typeof filter !== 'object' || Array.isArray(filter)) {
       return false;
     }
-    
-    if (!validOperators.includes(filter.operator)) {
+
+    const { column, value, operator } = filter;
+
+    if (typeof column !== 'string' || column.length === 0 || column.length > 255) {
       return false;
     }
-    
-    if (typeof filter.value !== 'string' || filter.value.length > 255) {
+
+    if (typeof value !== 'string' || value.length > 255) {
       return false;
     }
-  }
-  
-  return true;
+
+    if (operator && !validOperators.includes(operator)) {
+      return false;
+    }
+
+    return true;
+  });
 }
 
 /**

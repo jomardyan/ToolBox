@@ -11,6 +11,7 @@ bash dev.sh
 ```
 
 This will:
+
 - Set up SQLite database with demo users
 - Start backend server on `http://localhost:3000`
 - Start frontend dev server on `http://localhost:5173`
@@ -66,6 +67,7 @@ After database initialization, you can log in with:
 ### Development
 
 Development environment uses **SQLite** for simplicity:
+
 - Database file: `backend/dev.db`
 - Automatically created on first setup
 - Can be reset with: `npm run dev:setup`
@@ -73,6 +75,7 @@ Development environment uses **SQLite** for simplicity:
 ### Production
 
 Production should use **PostgreSQL** or **MySQL**:
+
 1. Set `DATABASE_URL` in `.env.production`
 2. Example: `postgresql://user:password@localhost:5432/toolbox`
 3. Run migrations: `npx prisma migrate deploy`
@@ -109,6 +112,7 @@ npm run lint          # Run linter
 ## API Documentation
 
 When backend is running, visit:
+
 - **Swagger UI:** `http://localhost:3000/api-docs`
 - **OpenAPI JSON:** `http://localhost:3000/api-docs/json`
 
@@ -136,6 +140,7 @@ When backend is running, visit:
 ## GitHub Codespaces
 
 When running on GitHub Codespaces:
+
 - Frontend will be at: `https://<codespace-name>-5173.app.github.dev`
 - Backend will be at: `https://<codespace-name>-3000.app.github.dev`
 - Frontend automatically detects and routes to correct backend URL

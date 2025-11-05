@@ -2,6 +2,7 @@ import {
   validateDataLength,
   isValidFormat,
   validateColumns,
+  validateFilterOptions,
   sanitizeInput,
 } from '../utils/validation';
 
@@ -121,6 +122,44 @@ describe('Validation Utilities', () => {
 
     test('should reject non-string column values', () => {
       expect(validateColumns(['name', 123, 'email'])).toBe(false);
+    });
+  });
+
+  describe('validateFilterOptions', () => {
+    test('should allow undefined filter options', () => {
+      expect(validateFilterOptions(undefined)).toBe(true);
+    });
+
+    test('should accept array of valid filter objects', () => {
+      const filters = [
+        { column: 'status', value: 'active', operator: 'equals' },
+        { column: 'email', value: '@example.com', operator: 'contains' },
+      ];
+      expect(validateFilterOptions(filters)).toBe(true);
+    });
+
+    test('should default operator when omitted', () => {
+      const filters = [{ column: 'status', value: 'active' }];
+      expect(validateFilterOptions(filters)).toBe(true);
+    });
+
+    test('should reject non-array input', () => {
+      expect(validateFilterOptions({ column: 'status', value: 'active' } as any)).toBe(false);
+    });
+
+    test('should reject invalid operator', () => {
+      const filters = [{ column: 'status', value: 'active', operator: 'invalid' }];
+      expect(validateFilterOptions(filters)).toBe(false);
+    });
+
+    test('should reject filters missing column', () => {
+      const filters = [{ value: 'active' } as any];
+      expect(validateFilterOptions(filters)).toBe(false);
+    });
+
+    test('should reject filters with non-string value', () => {
+      const filters = [{ column: 'status', value: 42 as any }];
+      expect(validateFilterOptions(filters)).toBe(false);
     });
   });
 
