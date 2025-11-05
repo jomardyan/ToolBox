@@ -28,7 +28,7 @@ export const FAQPage: React.FC = () => {
       description: 'A plain text format that uses commas to separate values. Each line represents a data record, and each record consists of one or more fields separated by commas.',
       extension: '.csv',
       useCase: 'Ideal for spreadsheet data, database exports, and simple tabular data. Widely supported by Excel, Google Sheets, and database systems.',
-      icon: <FiTable className="text-green-500" />,
+      icon: <FiTable className="text-green-500 dark:text-green-400" />,
       example: 'name,age,city\nJohn,30,New York\nJane,25,London'
     },
     {
@@ -37,7 +37,7 @@ export const FAQPage: React.FC = () => {
       description: 'A lightweight data interchange format that is easy for humans to read and write, and easy for machines to parse and generate. Uses key-value pairs and arrays.',
       extension: '.json',
       useCase: 'Perfect for API responses, configuration files, and web applications. The de facto standard for data exchange on the web.',
-      icon: <FiCode className="text-blue-500" />,
+      icon: <FiCode className="text-blue-500 dark:text-blue-400" />,
       example: '{"name": "John", "age": 30, "city": "New York"}'
     },
     {
@@ -46,7 +46,7 @@ export const FAQPage: React.FC = () => {
       description: 'A markup language that defines rules for encoding documents in a format that is both human-readable and machine-readable. Uses nested tags to represent data hierarchy.',
       extension: '.xml',
       useCase: 'Common in enterprise systems, SOAP APIs, configuration files, and document formats like Office files. Supports schema validation.',
-      icon: <FiCode className="text-orange-500" />,
+      icon: <FiCode className="text-orange-500 dark:text-orange-400" />,
       example: '<person><name>John</name><age>30</age></person>'
     },
     {
@@ -55,7 +55,7 @@ export const FAQPage: React.FC = () => {
       description: 'A human-friendly data serialization format that uses indentation to denote structure. More readable than JSON with support for comments.',
       extension: '.yaml, .yml',
       useCase: 'Popular for configuration files (Docker, Kubernetes), CI/CD pipelines, and settings. Preferred when human readability is priority.',
-      icon: <FiFileText className="text-purple-500" />,
+      icon: <FiFileText className="text-purple-500 dark:text-purple-400" />,
       example: 'name: John\nage: 30\ncity: New York'
     },
     {
@@ -64,7 +64,7 @@ export const FAQPage: React.FC = () => {
       description: 'The standard markup language for documents designed to be displayed in a web browser. Defines the structure and content of web pages.',
       extension: '.html, .htm',
       useCase: 'Web pages, email templates, and any content meant for browser display. Can include styling and scripts.',
-      icon: <FiCode className="text-red-500" />,
+      icon: <FiCode className="text-red-500 dark:text-red-400" />,
       example: '<table><tr><td>Name</td><td>John</td></tr></table>'
     },
     {
@@ -73,7 +73,7 @@ export const FAQPage: React.FC = () => {
       description: 'A simple text-based table format using spaces or special characters for alignment. Human-readable tabular representation.',
       extension: '.txt',
       useCase: 'Console output, plain text reports, and documentation. Great for displaying data in terminals or text editors.',
-      icon: <FiTable className="text-gray-500" />,
+      icon: <FiTable className="text-gray-600 dark:text-gray-400" />,
       example: '| Name  | Age | City     |\n|-------|-----|----------|\n| John  | 30  | New York |'
     },
     {
@@ -82,7 +82,7 @@ export const FAQPage: React.FC = () => {
       description: 'Similar to CSV but uses tabs instead of commas to separate values. More reliable when data contains commas.',
       extension: '.tsv, .tab',
       useCase: 'Data exports, clipboard data, and situations where comma conflicts exist. Cleaner for data containing punctuation.',
-      icon: <FiTable className="text-teal-500" />,
+      icon: <FiTable className="text-teal-500 dark:text-teal-400" />,
       example: 'name\tage\tcity\nJohn\t30\tNew York'
     },
     {
@@ -91,7 +91,7 @@ export const FAQPage: React.FC = () => {
       description: 'An XML-based format for geographic data, used to display geographic information in applications like Google Earth and Google Maps.',
       extension: '.kml',
       useCase: 'Geographic visualization, GPS data, mapping applications, and location-based services. Supports placemarks, paths, and polygons.',
-      icon: <FiCode className="text-green-600" />,
+      icon: <FiCode className="text-green-600 dark:text-green-400" />,
       example: '<kml><Placemark><name>Location</name><Point><coordinates>-122.0822,37.4220</coordinates></Point></Placemark></kml>'
     },
     {
@@ -100,7 +100,7 @@ export const FAQPage: React.FC = () => {
       description: 'Unformatted text without any special markup or structure. Contains only readable characters.',
       extension: '.txt',
       useCase: 'Notes, logs, simple documentation, and any basic text content. Universal compatibility across all platforms.',
-      icon: <FiFileText className="text-gray-600" />,
+      icon: <FiFileText className="text-gray-700 dark:text-gray-300" />,
       example: 'This is plain text content\nwith multiple lines'
     },
     {
@@ -109,7 +109,7 @@ export const FAQPage: React.FC = () => {
       description: 'A lightweight markup language with plain text formatting syntax. Converts to HTML while remaining highly readable in source form.',
       extension: '.md, .markdown',
       useCase: 'Documentation, README files, blogs, forums, and content management. Widely used on GitHub and static site generators.',
-      icon: <FiFileText className="text-blue-600" />,
+      icon: <FiFileText className="text-blue-600 dark:text-blue-400" />,
       example: '# Heading\n\n**Bold text** and *italic text*\n\n- List item'
     },
     {
@@ -118,7 +118,7 @@ export const FAQPage: React.FC = () => {
       description: 'A format where each line is a valid JSON object. Also known as newline-delimited JSON. Useful for streaming and large datasets.',
       extension: '.jsonl',
       useCase: 'Log files, streaming data, machine learning datasets, and processing large JSON collections line-by-line.',
-      icon: <FiDatabase className="text-blue-400" />,
+      icon: <FiDatabase className="text-blue-500 dark:text-blue-300" />,
       example: '{"name":"John","age":30}\n{"name":"Jane","age":25}'
     },
     {
@@ -127,7 +127,7 @@ export const FAQPage: React.FC = () => {
       description: 'Identical to JSONL - each line contains a separate JSON object. Optimized for streaming and incremental processing.',
       extension: '.ndjson',
       useCase: 'Same as JSONL - streaming APIs, log aggregation, and processing large datasets without loading everything into memory.',
-      icon: <FiDatabase className="text-indigo-500" />,
+      icon: <FiDatabase className="text-indigo-500 dark:text-indigo-400" />,
       example: '{"id":1,"value":"data"}\n{"id":2,"value":"more"}'
     },
     {
@@ -136,7 +136,7 @@ export const FAQPage: React.FC = () => {
       description: 'Simple format where each line represents a separate data item. No specific structure within each line.',
       extension: '.txt',
       useCase: 'Simple lists, line-by-line processing, word lists, and basic data collections. Easy to parse and manipulate.',
-      icon: <FiFileText className="text-gray-500" />,
+      icon: <FiFileText className="text-gray-600 dark:text-gray-400" />,
       example: 'Item 1\nItem 2\nItem 3'
     },
     {
@@ -145,7 +145,7 @@ export const FAQPage: React.FC = () => {
       description: 'A standard format for calendar data exchange. Stores events, tasks, appointments, and scheduling information.',
       extension: '.ics',
       useCase: 'Calendar applications, event sharing, meeting invitations, and scheduling systems. Compatible with Outlook, Google Calendar, Apple Calendar.',
-      icon: <FiFileText className="text-red-400" />,
+      icon: <FiFileText className="text-red-500 dark:text-red-300" />,
       example: 'BEGIN:VCALENDAR\nBEGIN:VEVENT\nSUMMARY:Meeting\nDTSTART:20250105T100000Z\nEND:VEVENT\nEND:VCALENDAR'
     },
     {
@@ -154,7 +154,7 @@ export const FAQPage: React.FC = () => {
       description: 'A configuration file format that is easy to read due to obvious semantics. Similar to INI files but with more features.',
       extension: '.toml',
       useCase: 'Configuration files for applications, especially popular in Rust projects (Cargo.toml). Clear section-based structure.',
-      icon: <FiCode className="text-yellow-600" />,
+      icon: <FiCode className="text-yellow-600 dark:text-yellow-400" />,
       example: '[database]\nserver = "192.168.1.1"\nports = [8001, 8002]'
     },
     {
@@ -163,7 +163,7 @@ export const FAQPage: React.FC = () => {
       description: 'Binary or XML-based spreadsheet format from Microsoft. Supports multiple sheets, formulas, formatting, and complex data structures.',
       extension: '.xlsx, .xls',
       useCase: 'Business reports, financial data, complex spreadsheets with calculations, charts, and formatting. Industry standard for tabular data.',
-      icon: <FiTable className="text-green-700" />,
+      icon: <FiTable className="text-green-700 dark:text-green-400" />,
       example: 'Binary format - typically contains sheets with rows and columns of data'
     },
     {
@@ -172,7 +172,7 @@ export const FAQPage: React.FC = () => {
       description: 'Scripts containing database commands for creating tables, inserting data, or querying databases. Standard language for relational databases.',
       extension: '.sql',
       useCase: 'Database migrations, data dumps, backup scripts, and database initialization. Works with MySQL, PostgreSQL, SQL Server, etc.',
-      icon: <FiDatabase className="text-blue-700" />,
+      icon: <FiDatabase className="text-blue-700 dark:text-blue-400" />,
       example: 'INSERT INTO users (name, age) VALUES (\'John\', 30);'
     }
   ];

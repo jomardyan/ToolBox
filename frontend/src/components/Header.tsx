@@ -8,14 +8,6 @@ export const Header: React.FC = () => {
   const { isAuthenticated, logout } = useAuthStore();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
 
-  React.useEffect(() => {
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
   return (
     <header className={`sticky top-0 z-50 border-b transition-colors ${
       darkMode 

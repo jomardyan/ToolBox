@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import type { ConversionHistory } from '../types';
+import { initializeDarkMode, toggleDarkMode as toggleDM } from '../utils/darkMode';
 
 interface AppState {
   darkMode: boolean;
@@ -10,14 +11,15 @@ interface AppState {
 }
 
 export const useAppStore = create<AppState>((set) => {
-  const isDark = localStorage.getItem('darkMode') === 'true';
+  // Initialize dark mode using centralized utility
+  const isDark = initializeDarkMode();
   
   return {
     darkMode: isDark,
     toggleDarkMode: () => {
       set((state) => {
-        const newMode = !state.darkMode;
-        localStorage.setItem('darkMode', String(newMode));
+        // Use centralized toggle function
+        const newMode = toggleDM(state.darkMode);
         return { darkMode: newMode };
       });
     },

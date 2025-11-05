@@ -2,6 +2,8 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HelmetProvider } from 'react-helmet-async'
 import 'bootstrap/dist/css/bootstrap.min.css'
+// Import dark mode utility first to initialize before anything else
+import './utils/darkMode'
 import './index.css'
 import App from './App.tsx'
 

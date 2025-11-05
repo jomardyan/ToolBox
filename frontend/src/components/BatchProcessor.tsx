@@ -123,7 +123,7 @@ export const BatchProcessor: React.FC = () => {
       <h2 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Batch Processor</h2>
 
       {/* Add Item Form */}
-      <div className="mb-6 p-6 bg-gray-100 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="mb-6 p-6 bg-gray-50 dark:bg-gray-900 rounded-lg border border-gray-200 dark:border-gray-700">
         <h3 className="font-semibold mb-4 text-xl text-gray-900 dark:text-gray-100">Add Conversion Item</h3>
 
         <div className="mb-4">

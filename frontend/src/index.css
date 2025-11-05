@@ -110,16 +110,31 @@
     transition-duration: 200ms;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
+  /* Ensure dark mode is applied systematically */
+  html,
+  html.dark {
+    color-scheme: light dark;
+  }
+
   body {
     margin: 0;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    background-color: white;
+    color: rgb(17 24 39);
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  html {
-    scroll-behavior: smooth;
+  .dark body,
+  body.darkmode--activated {
+    background-color: rgb(17 24 39);
+    color: rgb(243 244 246);
   }
 
   /* Custom scrollbar for webkit browsers */
@@ -253,6 +268,24 @@
 
   .text-shadow-lg {
     text-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  /* Force dark mode compatibility on all elements */
+  * {
+    @apply dark:border-gray-700;
+  }
+
+  /* Ensure input elements are styled in dark mode */
+  input:not([type='checkbox']):not([type='radio']),
+  select,
+  textarea {
+    @apply dark:bg-gray-900 dark:text-white dark:border-gray-600;
+  }
+
+  input:not([type='checkbox']):not([type='radio']):focus,
+  select:focus,
+  textarea:focus {
+    @apply dark:ring-blue-500;
   }
 }
 
