@@ -110,7 +110,15 @@ app.use(cors({
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'Accept', 'X-Request-ID'],
-  exposedHeaders: ['X-Request-ID', 'X-RateLimit-Limit', 'X-RateLimit-Remaining'],
+  exposedHeaders: [
+    'X-Request-ID',
+    'X-RateLimit-Limit',
+    'X-RateLimit-Remaining',
+    'X-Quota-Limit',
+    'X-Quota-Used',
+    'X-Quota-Remaining',
+    'X-Quota-Reset'
+  ],
   maxAge: 86400, // 24 hours
   preflightContinue: false,
   optionsSuccessStatus: 204
@@ -134,10 +142,14 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 // Basic IP-based rate limiting for all API routes (security layer)
 const ipLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 200, // Generous limit per IP (tier-based limiting is more granular)
+  max: process.env.NODE_ENV === 'development' ? 10000 : 200, // Much more generous in development
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true, // Return rate limit info in RateLimit-* headers
   legacyHeaders: false, // Disable X-RateLimit-* headers
+  skip: (req: Request) => {
+    // Skip rate limiting for health check endpoint
+    return req.path === '/health' || req.path === '/api/health';
+  },
   handler: (req: Request, res: Response) => {
     logger.warn(`IP rate limit exceeded for: ${req.ip}, RequestID: ${(req as any).requestId}`);
     res.status(429).json({
@@ -168,10 +180,11 @@ app.use((req: Request, res: Response, next: NextFunction) => {
 });
 
 // Usage tracking middleware (for billing and analytics)
-app.use(usageTrackingMiddleware);
+app.use('/api/user', usageTrackingMiddleware);
+app.use('/api/admin', usageTrackingMiddleware);
 
-// Quota enforcement middleware (check monthly limits)
-app.use(quotaEnforcementMiddleware);
+// Quota enforcement middleware (check monthly limits) - only for user endpoints
+app.use('/api/user', quotaEnforcementMiddleware);
 
 // ===== Health Check =====
 app.get('/health', (_req: Request, res: Response) => {

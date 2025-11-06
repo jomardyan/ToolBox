@@ -1,7 +1,7 @@
 // backend/src/middleware/rateLimitByTier.ts
 
 import { Request, Response, NextFunction } from 'express';
-import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
+import rateLimit, { RateLimitRequestHandler, ipKeyGenerator } from 'express-rate-limit';
 import { AuthRequest } from '../types/auth';
 import logger from '../utils/logger';
 
@@ -9,30 +9,55 @@ import logger from '../utils/logger';
  * Rate limit configurations by subscription tier
  * NOTE: Must be pre-created at app initialization, NOT dynamically per request
  */
+const isDevelopment = process.env.NODE_ENV === 'development';
+
+const getRateLimitKey = (req: Request): string => {
+  const authReq = req as AuthRequest;
+
+  if (authReq.user?.userId) {
+    return `user:${authReq.user.userId}`;
+  }
+
+  const apiKeyHeader = req.headers['x-api-key'];
+  if (typeof apiKeyHeader === 'string' && apiKeyHeader.length > 0) {
+    return `apiKey:${apiKeyHeader}`;
+  }
+
+  const forwardedFor = req.headers['x-forwarded-for'];
+  if (typeof forwardedFor === 'string' && forwardedFor.length > 0) {
+    const [firstIp] = forwardedFor.split(',');
+    if (firstIp) {
+      return firstIp.trim();
+    }
+  }
+
+  return ipKeyGenerator(req.ip || req.socket.remoteAddress || '127.0.0.1');
+};
+
 const RATE_LIMITS = {
   FREE: {
     windowMs: 60 * 1000, // 1 minute
-    max: 10, // 10 requests per minute
+    max: isDevelopment ? 10000 : 10, // Very high in development (100x higher)
     message: 'Free tier rate limit exceeded. Upgrade for higher limits.'
   },
   STARTER: {
     windowMs: 60 * 1000,
-    max: 30, // 30 requests per minute
+    max: isDevelopment ? 10000 : 30, // Very high in development (100x higher)
     message: 'Starter tier rate limit exceeded. Upgrade for higher limits.'
   },
   PROFESSIONAL: {
     windowMs: 60 * 1000,
-    max: 60, // 60 requests per minute
+    max: isDevelopment ? 10000 : 60, // Very high in development (100x higher)
     message: 'Professional tier rate limit exceeded. Upgrade for higher limits.'
   },
   BUSINESS: {
     windowMs: 60 * 1000,
-    max: 120, // 120 requests per minute
+    max: isDevelopment ? 10000 : 120, // Very high in development (100x higher)
     message: 'Business tier rate limit exceeded. Contact support for custom limits.'
   },
   ENTERPRISE: {
     windowMs: 60 * 1000,
-    max: 1000, // 1000 requests per minute (or custom)
+    max: 10000, // Already high, match others in dev
     message: 'Enterprise tier rate limit exceeded. Contact your account manager.'
   }
 };
@@ -40,13 +65,22 @@ const RATE_LIMITS = {
 /**
  * Pre-create rate limiters for each tier at app initialization
  */
-const tierLimiters = {
+type TierLimiterKey = keyof typeof RATE_LIMITS;
+
+type RateLimiterWithReset = RateLimitRequestHandler & {
+  store?: {
+    resetAll?: () => void;
+  };
+};
+
+const tierLimiters: Record<TierLimiterKey, RateLimiterWithReset> = {
   FREE: rateLimit({
     windowMs: RATE_LIMITS.FREE.windowMs,
     max: RATE_LIMITS.FREE.max,
     message: RATE_LIMITS.FREE.message,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getRateLimitKey,
     skip: (req: Request) => {
       // Skip if authenticated with higher tier (will be checked in middleware)
       const authReq = req as AuthRequest;
@@ -59,6 +93,7 @@ const tierLimiters = {
     message: RATE_LIMITS.STARTER.message,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getRateLimitKey,
     skipSuccessfulRequests: false,
     skipFailedRequests: false
   }),
@@ -68,6 +103,7 @@ const tierLimiters = {
     message: RATE_LIMITS.PROFESSIONAL.message,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getRateLimitKey,
     skipSuccessfulRequests: false,
     skipFailedRequests: false
   }),
@@ -77,6 +113,7 @@ const tierLimiters = {
     message: RATE_LIMITS.BUSINESS.message,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getRateLimitKey,
     skipSuccessfulRequests: false,
     skipFailedRequests: false
   }),
@@ -86,6 +123,7 @@ const tierLimiters = {
     message: RATE_LIMITS.ENTERPRISE.message,
     standardHeaders: true,
     legacyHeaders: false,
+    keyGenerator: getRateLimitKey,
     skipSuccessfulRequests: false,
     skipFailedRequests: false
   })
@@ -94,7 +132,7 @@ const tierLimiters = {
 /**
  * Static rate limiting middleware for unauthenticated requests
  */
-const unauthenticatedLimiter = rateLimit({
+const unauthenticatedLimiter: RateLimiterWithReset = rateLimit({
   windowMs: 60 * 1000,
   max: 10,
   message: 'Rate limit exceeded. Please authenticate or sign up for higher limits.',
@@ -102,6 +140,7 @@ const unauthenticatedLimiter = rateLimit({
   legacyHeaders: false,
   skipSuccessfulRequests: false,
   skipFailedRequests: false,
+  keyGenerator: getRateLimitKey,
   skip: (req: Request) => {
     // Skip if authenticated
     const authReq = req as AuthRequest;
@@ -161,6 +200,13 @@ export const rateLimitByTier = async (req: Request, res: Response, next: NextFun
     // Fallback to unauthenticated limiter on error
     return unauthenticatedLimiter(req, res, next);
   }
+};
+
+export const resetTierLimiters = () => {
+  Object.values(tierLimiters).forEach(limiter => {
+    limiter.store?.resetAll?.();
+  });
+  unauthenticatedLimiter.store?.resetAll?.();
 };
 
 export default rateLimitByTier;

@@ -3,16 +3,24 @@
 import { Router, Response } from 'express';
 import UsageService from '../services/usageService';
 import { authenticateToken, requireAuth } from '../middleware/auth';
+import { quotaEnforcementMiddleware } from '../middleware/quotaEnforcement';
+import { usageTrackingMiddleware } from '../middleware/usageTracking';
 import { AuthRequest } from '../types/auth';
 import logger from '../utils/logger';
 
 const router = Router();
 
+// Apply authentication and tracking middleware to all routes
+router.use(authenticateToken);
+router.use(requireAuth);
+router.use(usageTrackingMiddleware);
+router.use(quotaEnforcementMiddleware);
+
 /**
  * Get usage summary
  * GET /api/user/usage/summary
  */
-router.get('/summary', authenticateToken, requireAuth, async (req: AuthRequest, res: Response) => {
+router.get('/summary', async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({

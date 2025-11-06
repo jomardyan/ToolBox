@@ -2,6 +2,8 @@
 
 import { Router, Response } from 'express';
 import { authenticateTokenOrApiKey, authenticateToken } from '../middleware/auth';
+import { quotaEnforcementMiddleware } from '../middleware/quotaEnforcement';
+import { usageTrackingMiddleware } from '../middleware/usageTracking';
 import { AuthRequest } from '../types/auth';
 import { prisma } from '../config/database';
 import CryptoUtils from '../utils/cryptoUtils';
@@ -13,11 +15,16 @@ import * as path from 'path';
 
 const router = Router();
 
+// Apply usage tracking and quota enforcement to all routes in this router
+router.use(authenticateTokenOrApiKey);
+router.use(usageTrackingMiddleware);
+router.use(quotaEnforcementMiddleware);
+
 /**
  * Get user account (root - returns profile data)
  * GET /api/user/account
  */
-router.get('/', authenticateTokenOrApiKey, async (req: AuthRequest, res: Response) => {
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({

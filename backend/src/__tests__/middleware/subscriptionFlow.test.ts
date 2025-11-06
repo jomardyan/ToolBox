@@ -1,8 +1,10 @@
 // backend/src/__tests__/middleware/subscriptionFlow.test.ts
 
+import { afterAll, afterEach, beforeAll, describe, expect, it } from '@jest/globals';
 import request from 'supertest';
 import app from '../../app';
 import { prisma } from '../../config/database';
+import { resetTierLimiters } from '../../middleware/rateLimitByTier';
 import CryptoUtils from '../../utils/cryptoUtils';
 
 describe('Subscription Mechanism Integration', () => {
@@ -81,6 +83,19 @@ describe('Subscription Mechanism Integration', () => {
         keyPrefix: apiKeyData.prefix
       }
     });
+  });
+
+  afterEach(async () => {
+    // Wait a bit for async operations (usage tracking) to complete
+    await new Promise(resolve => setTimeout(resolve, 100));
+    
+    if (testUser?.id) {
+      await prisma.usageLog.deleteMany({ where: { userId: testUser.id } });
+    }
+    if (freePlan?.id) {
+      await prisma.plan.update({ where: { id: freePlan.id }, data: { monthlyLimit: 1000 } });
+    }
+    resetTierLimiters();
   });
 
   afterAll(async () => {
@@ -174,18 +189,16 @@ describe('Subscription Mechanism Integration', () => {
 
     it('should reject requests when quota exceeded', async () => {
       // Create usage logs to simulate quota usage
-      const usageLogs = [];
-      for (let i = 0; i < 1001; i++) { // Exceed 1000 limit
-        usageLogs.push({
-          userId: testUser.id,
-          endpoint: '/api/test',
-          method: 'GET',
-          statusCode: 200,
-          responseTimeMs: 100,
-          timestamp: new Date()
-        });
-      }
-      await prisma.usageLog.createMany({ data: usageLogs });
+      await prisma.plan.update({ where: { id: freePlan.id }, data: { monthlyLimit: 2 } });
+
+      // Consume quota within the reduced limit
+      await request(app)
+        .get('/api/user/account')
+        .set('Authorization', `Bearer ${testToken}`);
+
+      await request(app)
+        .get('/api/user/account')
+        .set('Authorization', `Bearer ${testToken}`);
 
       const response = await request(app)
         .get('/api/user/account')
@@ -193,7 +206,7 @@ describe('Subscription Mechanism Integration', () => {
 
       expect(response.status).toBe(429);
       expect(response.body.error).toContain('quota');
-    }, 15000); // Increase timeout for bulk insert
+    });
   });
 
   describe('Subscription Management', () => {

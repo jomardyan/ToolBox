@@ -3,6 +3,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthRequest } from '../types/auth';
 import logger from '../utils/logger';
+import { prisma } from '../config/database';
 
 /**
  * Middleware to track API usage for billing and analytics
@@ -12,6 +13,27 @@ export const usageTrackingMiddleware = async (req: Request, res: Response, next:
   const authReq = req as AuthRequest;
   const requestId = (req as any).requestId || 'unknown';
 
+  // Skip if not authenticated
+  if (!authReq.user?.userId) {
+    return next();
+  }
+
+  // Prepare usage data
+  const usageData = {
+    userId: authReq.user.userId,
+    apiKeyId: authReq.apiKey?.id,
+    endpoint: req.path,
+    method: req.method,
+    statusCode: res.statusCode,
+    responseTimeMs: 0,
+    tokensUsed: 1,
+    cost: 0,
+    ipAddress: req.ip || '',
+    userAgent: req.headers['user-agent']?.toString(),
+    errorMessage: undefined as string | undefined,
+    timestamp: new Date()
+  };
+
   // Capture the original end function
   const originalEnd = res.end;
   
@@ -20,58 +42,24 @@ export const usageTrackingMiddleware = async (req: Request, res: Response, next:
     // Restore original end
     res.end = originalEnd;
     
-    // Call original end
-    const result = res.end(chunk, encoding, callback);
+    // Calculate final response time
+    usageData.responseTimeMs = Date.now() - startTime;
+    usageData.statusCode = res.statusCode;
     
-    // Track usage asynchronously (don't block response)
-    trackUsage().catch(err => {
-      logger.error(`[${requestId}] Failed to track usage:`, err);
-    });
-    
-    return result;
-  };
-
-  async function trackUsage() {
-    try {
-      const responseTimeMs = Date.now() - startTime;
-      const userId = authReq.user?.userId;
-      const apiKeyId = authReq.apiKey?.id;
-      
-      // Only track if user is authenticated (skip public endpoints)
-      if (!userId) {
-        return;
-      }
-
-      const { PrismaClient } = await import('@prisma/client');
-      const prisma = new PrismaClient();
-
-      try {
-        await prisma.usageLog.create({
-          data: {
-            userId,
-            apiKeyId: apiKeyId || null,
-            endpoint: req.path,
-            method: req.method,
-            statusCode: res.statusCode,
-            responseTimeMs,
-            tokensUsed: 1, // Could be calculated based on request/response size
-            cost: 0, // Could be calculated based on pricing tier
-            ipAddress: req.ip,
-            userAgent: req.headers['user-agent'] || null,
-            errorMessage: res.statusCode >= 400 ? 'Error occurred' : null,
-            timestamp: new Date()
-          }
-        });
-
-        logger.debug(`[${requestId}] Usage tracked for user ${userId}: ${req.method} ${req.path} (${responseTimeMs}ms)`);
-      } finally {
-        await prisma.$disconnect();
-      }
-    } catch (error: any) {
-      // Don't throw - usage tracking shouldn't break the request
-      logger.error(`[${requestId}] Usage tracking error:`, error);
+    // Add error message if needed
+    if (res.statusCode >= 400) {
+      usageData.errorMessage = 'Error occurred';
     }
-  }
+    
+    // Track usage immediately before sending response
+    prisma.usageLog.create({ data: usageData })
+      .catch(err => {
+        logger.error(`[${requestId}] Failed to track usage:`, err);
+      });
+    
+    // Call original end
+    return originalEnd.call(this, chunk, encoding, callback);
+  };
 
   next();
 };

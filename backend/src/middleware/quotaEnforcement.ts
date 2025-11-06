@@ -3,6 +3,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { AuthRequest } from '../types/auth';
 import logger from '../utils/logger';
+import { prisma } from '../config/database';
 
 /**
  * Middleware to enforce monthly API usage quotas based on subscription plan
@@ -11,37 +12,32 @@ export const quotaEnforcementMiddleware = async (req: Request, res: Response, ne
   const authReq = req as AuthRequest;
   const requestId = (req as any).requestId || 'unknown';
 
+  // Skip quota check for unauthenticated requests
+  if (!authReq.user?.userId) {
+    return next();
+  }
+
   try {
-    // Skip quota check for unauthenticated requests
-    if (!authReq.user?.userId) {
-      return next();
-    }
-
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
-
-    try {
-      // Get user's active subscription
-      const subscription = await prisma.subscription.findFirst({
-        where: {
-          userId: authReq.user.userId,
-          status: 'ACTIVE'
-        },
-        include: {
-          plan: true
-        },
-        orderBy: {
-          createdAt: 'desc'
-        }
-      });
-
-      // If plan has unlimited quota (explicitly null), skip check
-      if (subscription?.plan?.monthlyLimit === null) {
-        await prisma.$disconnect();
-        return next();
+    // Get user's active subscription
+    const subscription = await prisma.subscription.findFirst({
+      where: {
+        userId: authReq.user.userId,
+        status: 'ACTIVE'
+      },
+      include: {
+        plan: true
+      },
+      orderBy: {
+        createdAt: 'desc'
       }
+    });
 
-      // If no subscription, apply free tier limits
+    logger.debug(`[${requestId}] Quota check for user ${authReq.user.userId}: subscription=${!!subscription}, plan=${subscription?.plan?.name}`);
+
+    // If plan has unlimited quota (explicitly null), skip check
+    if (subscription?.plan?.monthlyLimit === null) {
+      return next();
+    }    // If no subscription, apply free tier limits
       const monthlyLimit = subscription?.plan?.monthlyLimit ?? 1000; // Default 1000 for free tier
 
       // Get current billing cycle dates
@@ -63,39 +59,33 @@ export const quotaEnforcementMiddleware = async (req: Request, res: Response, ne
         }
       });
 
-      // Check if quota exceeded
-      if (usageCount >= monthlyLimit) {
-        logger.warn(`[${requestId}] Monthly quota exceeded for user ${authReq.user.userId}: ${usageCount}/${monthlyLimit}`);
-        
-        await prisma.$disconnect();
-        
-        return res.status(429).json({
-          success: false,
-          error: 'Monthly API quota exceeded',
-          statusCode: 429,
-          requestId,
-          quota: {
-            limit: monthlyLimit,
-            used: usageCount,
-            remaining: 0,
-            resetDate: cycleEnd
-          },
-          upgradeUrl: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/subscription/upgrade` : undefined
-        });
-      }
+    // Add quota info to response headers
+    res.set({
+      'X-Quota-Limit': monthlyLimit.toString(),
+      'X-Quota-Used': usageCount.toString(),
+      'X-Quota-Remaining': (monthlyLimit - usageCount).toString(),
+      'X-Quota-Reset': cycleEnd.toISOString()
+    });
 
-      // Add quota info to response headers
-      res.setHeader('X-Quota-Limit', monthlyLimit.toString());
-      res.setHeader('X-Quota-Used', usageCount.toString());
-      res.setHeader('X-Quota-Remaining', (monthlyLimit - usageCount).toString());
-      res.setHeader('X-Quota-Reset', cycleEnd.toISOString());
-
-      await prisma.$disconnect();
-      next();
-    } catch (error) {
-      await prisma.$disconnect();
-      throw error;
+    // Check if quota exceeded
+    if (usageCount >= monthlyLimit) {
+      logger.warn(`[${requestId}] Monthly quota exceeded for user ${authReq.user.userId}: ${usageCount}/${monthlyLimit}`);
+      return res.status(429).json({
+        success: false,
+        error: 'Monthly API quota exceeded',
+        statusCode: 429,
+        requestId,
+        quota: {
+          limit: monthlyLimit,
+          used: usageCount,
+          remaining: 0,
+          resetDate: cycleEnd
+        },
+        upgradeUrl: process.env.FRONTEND_URL ? `${process.env.FRONTEND_URL}/subscription/upgrade` : undefined
+      });
     }
+
+    next();
   } catch (error: any) {
     logger.error(`[${requestId}] Quota enforcement error:`, error);
     // On error, allow request to proceed (fail open)

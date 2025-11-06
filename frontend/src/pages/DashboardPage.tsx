@@ -22,13 +22,22 @@ export const DashboardPage = () => {
   const { darkMode } = useAppStore();
 
   useEffect(() => {
+    let isMounted = true;
+    let abortController: AbortController | null = null;
+
     const fetchStats = async () => {
       try {
         setLoading(true);
+        // Create abort controller for request cancellation
+        abortController = new AbortController();
+        
         const [quotaRes, keysRes] = await Promise.all([
           api.getQuotaStatus(),
           api.getApiKeys()
         ]);
+
+        // Only update state if component is still mounted
+        if (!isMounted) return;
 
         const quota = quotaRes.data.data;
         const keys = keysRes.data.data;
@@ -41,13 +50,24 @@ export const DashboardPage = () => {
           apiKeysCount: keys.length || 0
         });
       } catch (err: any) {
-        setError(err.response?.data?.message || 'Failed to load stats');
+        // Only update state if component is still mounted and error isn't from abort
+        if (isMounted && !abortController?.signal.aborted) {
+          setError(err.response?.data?.message || 'Failed to load stats');
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchStats();
+
+    // Cleanup function to prevent state updates on unmount
+    return () => {
+      isMounted = false;
+      abortController?.abort();
+    };
   }, []);
 
   if (loading) {

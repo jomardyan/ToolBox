@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Header } from './components/Header';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
@@ -18,8 +19,61 @@ import { AdminUsers } from './components/AdminUsers';
 import { AdminPlans } from './components/AdminPlans';
 import { AdminAnalytics } from './components/AdminAnalytics';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { useAuthStore } from './store/authStore';
+import { api } from './utils/apiClient';
 
 function App() {
+  const { setUser, logout, setLoading, isLoading } = useAuthStore();
+
+  // Check authentication status on app load
+  useEffect(() => {
+    const initAuth = async () => {
+      const accessToken = localStorage.getItem('accessToken');
+      
+      // If no access token, user is not logged in
+      if (!accessToken) {
+        logout();
+        setLoading(false);
+        return;
+      }
+
+      // Verify the token by fetching current user
+      setLoading(true);
+      try {
+        const response = await api.getMe();
+        if (response.data.success && response.data.data) {
+          setUser(response.data.data);
+        } else {
+          // Token invalid, clear auth
+          logout();
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+        }
+      } catch (error) {
+        // Token expired or invalid, logout
+        logout();
+        localStorage.removeItem('accessToken');
+        localStorage.removeItem('refreshToken');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    initAuth();
+  }, [setUser, logout, setLoading]);
+
+  // Show loading spinner while checking auth
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-purple-50 to-pink-50">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <BrowserRouter>
       <Header />

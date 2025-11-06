@@ -236,7 +236,7 @@ model ApiKey {
 }
 
 model UsageLog {
-  id                BigInt          @id @default(autoincrement())
+  id                String          @id @default(uuid())
   userId            String
   user              User            @relation(fields: [userId], references: [id], onDelete: Cascade)
   apiKeyId          String?

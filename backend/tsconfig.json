@@ -19,7 +19,7 @@
     "noFallthroughCasesInSwitch": true,
     "removeComments": true,
     "preserveConstEnums": false,
-    "moduleResolution": "node"
+    "moduleResolution": "node16"
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]

@@ -4,16 +4,24 @@ import { Router, Response } from 'express';
 import { prisma } from '../config/database';
 import StripeService from '../services/stripeService';
 import { authenticateToken, requireAuth } from '../middleware/auth';
+import { quotaEnforcementMiddleware } from '../middleware/quotaEnforcement';
+import { usageTrackingMiddleware } from '../middleware/usageTracking';
 import { AuthRequest } from '../types/auth';
 import logger from '../utils/logger';
 
 const router = Router();
 
+// Apply authentication and tracking middleware to all routes
+router.use(authenticateToken);
+router.use(requireAuth);
+router.use(usageTrackingMiddleware);
+router.use(quotaEnforcementMiddleware);
+
 /**
  * Get current subscription
  * GET /api/user/subscription
  */
-router.get('/', authenticateToken, requireAuth, async (req: AuthRequest, res: Response) => {
+router.get('/', async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({
