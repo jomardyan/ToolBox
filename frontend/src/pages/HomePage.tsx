@@ -42,11 +42,11 @@ export const HomePage: React.FC = () => {
     setSuccess('');
 
     try {
-      const result = await conversionService.convert({
-        data: inputData,
+      const result = await conversionService.convert(
+        inputData,
         sourceFormat,
-        targetFormat,
-      });
+        targetFormat
+      );
 
       if (result.success && result.data) {
         setOutputData(result.data);

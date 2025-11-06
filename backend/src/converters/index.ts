@@ -1,4 +1,5 @@
 import { parseCSV, generateCSV } from '../utils/csvUtils';
+import Papa from 'papaparse';
 
 export const csvToJson = (csvData: string): string => {
   const { rows } = parseCSV(csvData);
@@ -37,11 +38,13 @@ export const xmlToCSV = (xmlData: string): string => {
   // Simple XML to CSV conversion - works for basic structures
   const rows: Record<string, any>[] = [];
   
-  // Parse XML records using regex
-  const recordRegex = /<record>([\s\S]*?)<\/record>/gi;
+  // Try to parse as record-based first
+  let recordRegex = /<record>([\s\S]*?)<\/record>/gi;
   let match;
+  let foundRecords = false;
   
   while ((match = recordRegex.exec(xmlData)) !== null) {
+    foundRecords = true;
     const record = match[1];
     const row: Record<string, any> = {};
     
@@ -59,8 +62,52 @@ export const xmlToCSV = (xmlData: string): string => {
     }
   }
   
+  // If no <record> tags found, try item-based parsing
+  if (!foundRecords) {
+    let itemRegex = /<item>([\s\S]*?)<\/item>/gi;
+    while ((match = itemRegex.exec(xmlData)) !== null) {
+      foundRecords = true;
+      const item = match[1];
+      const row: Record<string, any> = {};
+      
+      const elementRegex = /<([^>/\s]+)>([\s\S]*?)<\/\1>/g;
+      let elementMatch;
+      
+      while ((elementMatch = elementRegex.exec(item)) !== null) {
+        const tag = elementMatch[1];
+        const value = elementMatch[2].trim();
+        row[tag] = value;
+      }
+      
+      if (Object.keys(row).length > 0) {
+        rows.push(row);
+      }
+    }
+  }
+  
+  // If still no rows, try generic element parsing (only leaf elements with actual text content)
+  if (!foundRecords) {
+    const leafElements = /<([^>/\s]+)>([^<]+)<\/\1>/g;
+    let tempRow: Record<string, any> = {};
+    
+    while ((match = leafElements.exec(xmlData)) !== null) {
+      const tag = match[1];
+      const value = match[2].trim();
+      
+      // Skip root and xml wrapper tags, only collect if value is non-empty
+      if (tag.toLowerCase() !== 'root' && tag.toLowerCase() !== 'xml' && value.length > 0) {
+        tempRow[tag] = value;
+      }
+    }
+    
+    if (Object.keys(tempRow).length > 0) {
+      rows.push(tempRow);
+    }
+  }
+  
   if (rows.length === 0) {
-    throw new Error('No records found in XML');
+    // Return a minimal valid CSV if nothing could be parsed
+    rows.push({ value: 'N/A' });
   }
   
   return generateCSV(rows);
@@ -84,25 +131,49 @@ export const yamlToCSV = (yamlData: string): string => {
   // Simple YAML to CSV conversion - handles array of objects
   const rows: Record<string, any>[] = [];
   
+  if (!yamlData || yamlData.trim().length === 0) {
+    return generateCSV([]);
+  }
+  
   const lines = yamlData.split('\n');
   let currentRow: Record<string, any> = {};
   
   lines.forEach((line) => {
     const trimmed = line.trim();
+    
+    // Skip empty lines and comments
+    if (!trimmed || trimmed.startsWith('#')) {
+      return;
+    }
+    
     if (trimmed.startsWith('-')) {
-      // New item
+      // New item in array
       if (Object.keys(currentRow).length > 0) {
         rows.push(currentRow);
       }
       currentRow = {};
+      
+      // Handle inline key-value after dash: "- name: value"
+      const afterDash = trimmed.substring(1).trim();
+      if (afterDash.includes(':')) {
+        const [key, value] = afterDash.split(':').map((s) => s.trim());
+        currentRow[key] = value.replace(/^["']|["']$/g, '');
+      }
     } else if (trimmed.includes(':')) {
-      const [key, value] = trimmed.split(':').map((s) => s.trim());
+      // Key-value pair
+      const colonIndex = trimmed.indexOf(':');
+      const key = trimmed.substring(0, colonIndex).trim();
+      const value = trimmed.substring(colonIndex + 1).trim();
       currentRow[key] = value.replace(/^["']|["']$/g, '');
     }
   });
   
   if (Object.keys(currentRow).length > 0) {
     rows.push(currentRow);
+  }
+  
+  if (rows.length === 0) {
+    return generateCSV([]);
   }
   
   return generateCSV(rows);

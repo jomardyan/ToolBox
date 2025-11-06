@@ -7,25 +7,24 @@ import { Request, Response, NextFunction } from 'express';
  * Supports version in URL path (/api/v1/...) or Accept header
  */
 export const apiVersionMiddleware = (req: Request, res: Response, next: NextFunction) => {
-  // Extract version from URL path
-  const pathMatch = req.path.match(/^\/api\/v(\d+)\//);
-  if (pathMatch) {
-    req.headers['x-api-version'] = pathMatch[1];
-  }
+  let version = '1';
   
-  // Extract version from Accept header (e.g., application/vnd.api.v1+json)
+  // Extract version from Accept header first (e.g., application/vnd.api.v1+json)
   const acceptHeader = req.headers['accept'];
   if (acceptHeader) {
     const versionMatch = acceptHeader.match(/\.v(\d+)\+/);
     if (versionMatch) {
-      req.headers['x-api-version'] = versionMatch[1];
+      version = versionMatch[1];
     }
   }
   
-  // Default to v1 if no version specified
-  if (!req.headers['x-api-version']) {
-    req.headers['x-api-version'] = '1';
+  // URL path version takes priority over Accept header
+  const pathMatch = req.path.match(/^\/api\/v(\d+)\//);
+  if (pathMatch) {
+    version = pathMatch[1];
   }
+  
+  req.headers['x-api-version'] = version;
   
   // Add version to response header
   res.setHeader('X-API-Version', req.headers['x-api-version']);

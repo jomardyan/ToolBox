@@ -67,14 +67,15 @@ class Config {
     this.NODE_ENV = process.env.NODE_ENV || 'development';
     this.LOG_LEVEL = process.env.LOG_LEVEL || 'info';
 
-    // Security - REQUIRED in production
-    this.JWT_SECRET = this.getRequired('JWT_SECRET');
-    this.JWT_REFRESH_SECRET = this.getRequired('JWT_REFRESH_SECRET');
+    // Security - Strict in production, defaults in development
+    this.JWT_SECRET = this.getRequired('JWT_SECRET', 'dev-jwt-secret-32-chars-minimum-required-!!');
+    this.JWT_REFRESH_SECRET = this.getRequired('JWT_REFRESH_SECRET', 'dev-jwt-refresh-secret-32-chars-required-!!');
     this.JWT_EXPIRATION = process.env.JWT_EXPIRATION || '15m';
     this.JWT_REFRESH_EXPIRATION = process.env.JWT_REFRESH_EXPIRATION || '7d';
 
-    // Database - REQUIRED
-    this.DATABASE_URL = this.getRequired('DATABASE_URL');
+    // Database - Default to SQLite in development
+    const defaultDbUrl = this.NODE_ENV === 'development' ? 'file:./dev.db' : undefined;
+    this.DATABASE_URL = this.getRequired('DATABASE_URL', defaultDbUrl);
     this.DATABASE_POOL_SIZE = parseInt(process.env.DATABASE_POOL_SIZE || '20', 10);
 
     // Redis
@@ -121,36 +122,47 @@ class Config {
   }
 
   /**
-   * Get required environment variable or throw error
+   * Get required environment variable or throw error (in production)
+   * In development, provide sensible defaults
    */
-  private getRequired(key: string): string {
+  private getRequired(key: string, defaultValue?: string): string {
     const value = process.env[key];
-    
+
+    // Development mode: use defaults if available, don't require
+    if (this.NODE_ENV === 'development' || this.NODE_ENV === 'test') {
+      if (!value && defaultValue) {
+        return defaultValue;
+      }
+      if (!value && key.startsWith('JWT')) {
+        return `dev-${key.toLowerCase()}-32-chars-minimum-required-!!`;
+      }
+      return value || defaultValue || '';
+    }
+
+    // Production mode: strict requirement
     if (!value) {
       throw new Error(`Missing required environment variable: ${key}`);
     }
 
-    // Check for placeholder values
-    const placeholders = ['change-in-prod', 'your-secret', 'your-key', 'placeholder'];
-    if (this.NODE_ENV === 'production' && placeholders.some(p => value.includes(p))) {
-      throw new Error(`Environment variable ${key} contains placeholder value in production`);
+    // Check for placeholder values in production
+    const placeholders = ['change-in-prod', 'your-secret', 'your-key', 'placeholder', 'dev-'];
+    if (placeholders.some(p => value.includes(p))) {
+      throw new Error(`Environment variable ${key} contains placeholder/development value in production`);
     }
 
     return value;
-  }
-
-  /**
+  }  /**
    * Validate configuration
    */
   private validate(): void {
     const errors: string[] = [];
 
-    // Validate JWT secrets are different
-    if (this.JWT_SECRET === this.JWT_REFRESH_SECRET) {
+    // Validate JWT secrets are different (only in production)
+    if (this.NODE_ENV === 'production' && this.JWT_SECRET === this.JWT_REFRESH_SECRET) {
       errors.push('JWT_SECRET and JWT_REFRESH_SECRET must be different');
     }
 
-    // Validate JWT secret strength in production
+    // Validate JWT secret strength in production only
     if (this.NODE_ENV === 'production') {
       if (this.JWT_SECRET.length < 32) {
         errors.push('JWT_SECRET must be at least 32 characters in production');

@@ -27,10 +27,14 @@ import webhookRoutes from './routes/webhookRoutes';
 import oauthRoutes from './routes/oauthRoutes';
 import twoFactorRoutes from './routes/twoFactorRoutes';
 import metricsRoutes from './routes/metricsRoutes';
+import conversionRoutes from './routes/conversionRoutes';
 
 const app: Express = express();
 
 // ===== Middleware =====
+
+// Trust proxy - needed for Codespaces and production environments with reverse proxies
+app.set('trust proxy', 1);
 
 // Security middleware with enhanced configuration
 app.use(helmet({
@@ -56,12 +60,60 @@ app.use(helmet({
 }));
 app.use(compression());
 
-// CORS configuration
+// CORS configuration - Smart handling for development, strict for production
+const getCorsOrigin = () => {
+  const isDevelopment = process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test';
+  
+  if (isDevelopment) {
+    // In development, accept requests from common local addresses and Codespaces domains
+    return (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      // Allow requests without origin (like mobile apps, curl, etc.)
+      if (!origin) return callback(null, true);
+      
+      // Check if it's localhost
+      if (origin.includes('localhost') || origin.includes('127.0.0.1')) {
+        return callback(null, true);
+      }
+      
+      // Check if it's a Codespaces domain (*.github.dev)
+      if (origin.includes('.github.dev') || origin.includes('app.github.dev')) {
+        return callback(null, true);
+      }
+      
+      // Check env variable CORS_ORIGINS
+      const allowedOrigins = process.env.CORS_ORIGINS?.split(',').map((o: string) => o.trim()) || [];
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      
+      logger.warn(`CORS rejected origin in dev mode: ${origin}`);
+      return callback(null, true); // Still allow, but log it
+    };
+  } else {
+    // In production, strictly enforce CORS_ORIGINS
+    return (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      if (!origin) return callback(null, true);
+      
+      const allowedOrigins = process.env.CORS_ORIGINS?.split(',').map((o: string) => o.trim()) || [];
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      
+      logger.error(`CORS rejected origin in production: ${origin}`);
+      return callback(new Error('CORS policy violation'), false);
+    };
+  }
+};
+
 app.use(cors({
-  origin: process.env.CORS_ORIGINS?.split(',') || ['http://localhost:3000'],
+  origin: getCorsOrigin(),
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key']
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-API-Key', 'Accept', 'X-Request-ID'],
+  exposedHeaders: ['X-Request-ID', 'X-RateLimit-Limit', 'X-RateLimit-Remaining'],
+  maxAge: 86400, // 24 hours
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
 // Body parser middleware
@@ -137,15 +189,6 @@ app.use('/api/metrics', metricsRoutes);
 
 // ===== API Routes =====
 
-// Public auth routes
-app.use('/api/auth', authRoutes);
-
-// OAuth routes (public)
-app.use('/api/oauth', oauthRoutes);
-
-// 2FA routes (public - auth middleware added in routes)
-app.use('/api/2fa', twoFactorRoutes);
-
 // User routes (protected)
 app.use('/api/user/account', accountRoutes);
 app.use('/api/user/api-keys', apiKeyRoutes);
@@ -158,8 +201,20 @@ app.use('/api/admin/analytics', adminAnalyticsRoutes);
 app.use('/api/admin/users', adminUsersRoutes);
 app.use('/api/admin/plans', adminPlansRoutes);
 
+// Public auth routes
+app.use('/api/auth', authRoutes);
+
+// OAuth routes (public)
+app.use('/api/oauth', oauthRoutes);
+
+// 2FA routes (public - auth middleware added in routes)
+app.use('/api/2fa', twoFactorRoutes);
+
 // Webhook routes (verify signature, not protected)
 app.use('/api/stripe', webhookRoutes);
+
+// Conversion routes (public - no auth required)
+app.use('/api', conversionRoutes);
 
 // ===== Error Handling =====
 

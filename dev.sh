@@ -19,6 +19,10 @@ set -o pipefail  # Catch errors in pipes
 # Configuration
 # ============================================
 
+# Set Development Environment
+export NODE_ENV=development
+export LOG_LEVEL=debug
+
 # Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'

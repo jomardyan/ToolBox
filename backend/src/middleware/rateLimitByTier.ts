@@ -1,12 +1,13 @@
 // backend/src/middleware/rateLimitByTier.ts
 
 import { Request, Response, NextFunction } from 'express';
-import rateLimit from 'express-rate-limit';
+import rateLimit, { RateLimitRequestHandler } from 'express-rate-limit';
 import { AuthRequest } from '../types/auth';
 import logger from '../utils/logger';
 
 /**
  * Rate limit configurations by subscription tier
+ * NOTE: Must be pre-created at app initialization, NOT dynamically per request
  */
 const RATE_LIMITS = {
   FREE: {
@@ -37,30 +38,96 @@ const RATE_LIMITS = {
 };
 
 /**
- * Dynamic rate limiting based on user's subscription tier
+ * Pre-create rate limiters for each tier at app initialization
+ */
+const tierLimiters = {
+  FREE: rateLimit({
+    windowMs: RATE_LIMITS.FREE.windowMs,
+    max: RATE_LIMITS.FREE.max,
+    message: RATE_LIMITS.FREE.message,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skip: (req: Request) => {
+      // Skip if authenticated with higher tier (will be checked in middleware)
+      const authReq = req as AuthRequest;
+      return !!authReq.user?.userId;
+    }
+  }),
+  STARTER: rateLimit({
+    windowMs: RATE_LIMITS.STARTER.windowMs,
+    max: RATE_LIMITS.STARTER.max,
+    message: RATE_LIMITS.STARTER.message,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: false,
+    skipFailedRequests: false
+  }),
+  PROFESSIONAL: rateLimit({
+    windowMs: RATE_LIMITS.PROFESSIONAL.windowMs,
+    max: RATE_LIMITS.PROFESSIONAL.max,
+    message: RATE_LIMITS.PROFESSIONAL.message,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: false,
+    skipFailedRequests: false
+  }),
+  BUSINESS: rateLimit({
+    windowMs: RATE_LIMITS.BUSINESS.windowMs,
+    max: RATE_LIMITS.BUSINESS.max,
+    message: RATE_LIMITS.BUSINESS.message,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: false,
+    skipFailedRequests: false
+  }),
+  ENTERPRISE: rateLimit({
+    windowMs: RATE_LIMITS.ENTERPRISE.windowMs,
+    max: RATE_LIMITS.ENTERPRISE.max,
+    message: RATE_LIMITS.ENTERPRISE.message,
+    standardHeaders: true,
+    legacyHeaders: false,
+    skipSuccessfulRequests: false,
+    skipFailedRequests: false
+  })
+};
+
+/**
+ * Static rate limiting middleware for unauthenticated requests
+ */
+const unauthenticatedLimiter = rateLimit({
+  windowMs: 60 * 1000,
+  max: 10,
+  message: 'Rate limit exceeded. Please authenticate or sign up for higher limits.',
+  standardHeaders: true,
+  legacyHeaders: false,
+  skipSuccessfulRequests: false,
+  skipFailedRequests: false,
+  skip: (req: Request) => {
+    // Skip if authenticated
+    const authReq = req as AuthRequest;
+    return !!authReq.user?.userId;
+  }
+});
+
+/**
+ * Tier-based rate limiting middleware
+ * Routes requests to appropriate pre-created limiter based on subscription tier
  */
 export const rateLimitByTier = async (req: Request, res: Response, next: NextFunction) => {
   const authReq = req as AuthRequest;
   const requestId = (req as any).requestId || 'unknown';
   
   try {
-    // If no authenticated user, apply default strict limit
+    // If no authenticated user, apply default unauthenticated limit
     if (!authReq.user?.userId) {
-      const defaultLimiter = rateLimit({
-        windowMs: 60 * 1000,
-        max: 10,
-        message: 'Rate limit exceeded. Please authenticate or sign up for higher limits.',
-        standardHeaders: true,
-        legacyHeaders: false
-      });
-      return defaultLimiter(req, res, next);
+      return unauthenticatedLimiter(req, res, next);
     }
 
-    // Get user's subscription tier
-    const { PrismaClient } = await import('@prisma/client');
-    const prisma = new PrismaClient();
-
+    // For authenticated users, check their subscription tier
+    let tier = 'FREE';
+    
     try {
+      const { prisma } = await import('../config/database');
       const subscription = await prisma.subscription.findFirst({
         where: {
           userId: authReq.user.userId,
@@ -74,59 +141,25 @@ export const rateLimitByTier = async (req: Request, res: Response, next: NextFun
         }
       });
 
-      let tierConfig = RATE_LIMITS.FREE;
-
       if (subscription && subscription.plan) {
-        // Use plan's rate limit if defined
-        if (subscription.plan.rateLimit) {
-          tierConfig = {
-            windowMs: 60 * 1000,
-            max: subscription.plan.rateLimit,
-            message: `${subscription.plan.name} tier rate limit exceeded.`
-          };
-        } else {
-          // Fallback to predefined tiers based on plan name
-          const planName = subscription.plan.name.toUpperCase();
-          if (planName.includes('STARTER')) tierConfig = RATE_LIMITS.STARTER;
-          else if (planName.includes('PROFESSIONAL') || planName.includes('PRO')) tierConfig = RATE_LIMITS.PROFESSIONAL;
-          else if (planName.includes('BUSINESS')) tierConfig = RATE_LIMITS.BUSINESS;
-          else if (planName.includes('ENTERPRISE')) tierConfig = RATE_LIMITS.ENTERPRISE;
-        }
+        const planName = subscription.plan.name.toUpperCase();
+        if (planName.includes('STARTER')) tier = 'STARTER';
+        else if (planName.includes('PROFESSIONAL') || planName.includes('PRO')) tier = 'PROFESSIONAL';
+        else if (planName.includes('BUSINESS')) tier = 'BUSINESS';
+        else if (planName.includes('ENTERPRISE')) tier = 'ENTERPRISE';
       }
-
-      // Create rate limiter with tier-specific config
-      const tierLimiter = rateLimit({
-        ...tierConfig,
-        standardHeaders: true,
-        legacyHeaders: false,
-        handler: (req: Request, res: Response) => {
-          logger.warn(`[${requestId}] Rate limit exceeded for user ${authReq.user?.userId}`);
-          res.status(429).json({
-            success: false,
-            error: tierConfig.message,
-            statusCode: 429,
-            requestId,
-            retryAfter: Math.ceil(tierConfig.windowMs / 1000)
-          });
-        }
-      });
-
-      await prisma.$disconnect();
-      return tierLimiter(req, res, next);
-    } catch (error) {
-      await prisma.$disconnect();
-      throw error;
+    } catch (error: any) {
+      logger.debug(`[${requestId}] Could not fetch subscription, using FREE tier:`, error.message);
+      tier = 'FREE';
     }
+
+    // Use the appropriate pre-created limiter for this tier
+    const selectedLimiter = tierLimiters[tier as keyof typeof tierLimiters] || tierLimiters.FREE;
+    return selectedLimiter(req, res, next);
   } catch (error: any) {
-    logger.error(`[${requestId}] Rate limit tier check error:`, error);
-    // Fallback to default rate limit on error
-    const defaultLimiter = rateLimit({
-      windowMs: 60 * 1000,
-      max: 10,
-      standardHeaders: true,
-      legacyHeaders: false
-    });
-    return defaultLimiter(req, res, next);
+    logger.error(`[${requestId}] Rate limit middleware error:`, error.message);
+    // Fallback to unauthenticated limiter on error
+    return unauthenticatedLimiter(req, res, next);
   }
 };
 

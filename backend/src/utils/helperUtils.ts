@@ -41,7 +41,7 @@ export const deepClone = <T>(obj: T): T => {
  */
 export const mergeObjects = <T extends Record<string, any>>(
   target: T,
-  ...sources: Partial<T>[]
+  ...sources: (Partial<T> | undefined | null)[]
 ): T => {
   const result: any = { ...target };
 

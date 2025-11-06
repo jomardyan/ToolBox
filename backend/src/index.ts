@@ -1,13 +1,24 @@
-import 'dotenv/config';
+import * as dotenv from 'dotenv';
+import path from 'path';
+
+// Load environment-specific .env files
+const nodeEnv = process.env.NODE_ENV || 'development';
+const envFile = path.join(__dirname, '..', `../.env.${nodeEnv}`);
+const baseEnvFile = path.join(__dirname, '..', '../.env');
+
+// Try to load environment-specific file first, then base .env file
+dotenv.config({ path: envFile });
+dotenv.config({ path: baseEnvFile });
+
 import app from './app';
 import logger from './utils/logger';
-import { validateStartupConfig } from './utils/startup';
+import { validateEnvironment } from './utils/startup';
 const PORT = parseInt(process.env.PORT || '3000', 10);
 const HOST = process.env.HOST || '0.0.0.0';
 
 // Validate configuration before starting
 try {
-  validateStartupConfig();
+  validateEnvironment();
   logger.info('✓ Startup configuration validated');
 } catch (error: any) {
   logger.error('✗ Startup validation failed:', error);

@@ -26,9 +26,18 @@ export const validateEmail = (email: string): boolean => {
  * Validate URL
  */
 export const validateURL = (url: string): boolean => {
+  if (!url || typeof url !== 'string') {
+    return false;
+  }
+  
+  if (url.trim().length === 0) {
+    return false;
+  }
+  
   try {
-    new URL(url);
-    return true;
+    const urlObj = new URL(url);
+    const validProtocols = ['http:', 'https:', 'ftp:', 'ftps:'];
+    return validProtocols.includes(urlObj.protocol);
   } catch {
     return false;
   }

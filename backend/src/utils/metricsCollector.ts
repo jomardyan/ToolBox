@@ -7,13 +7,11 @@ import logger from './logger';
  * In production, this should be replaced with proper metrics service (Prometheus, DataDog, etc.)
  */
 class MetricsCollector {
-  private metrics: Map<string, any>;
   private counters: Map<string, number>;
   private gauges: Map<string, number>;
   private histograms: Map<string, number[]>;
 
   constructor() {
-    this.metrics = new Map();
     this.counters = new Map();
     this.gauges = new Map();
     this.histograms = new Map();
@@ -111,7 +109,7 @@ class MetricsCollector {
       result.gauges[key] = value;
     });
 
-    this.histograms.forEach((values, key) => {
+    this.histograms.forEach((_values, key) => {
       result.histograms[key] = this.getHistogramStats(key);
     });
 

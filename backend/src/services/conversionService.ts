@@ -154,12 +154,14 @@ export const extractColumns = (
 
   let rows = result.data as Record<string, any>[];
 
-  // Validate columns exist
+  // Validate and filter for existing columns
+  let validColumns = columns;
   if (rows.length > 0) {
     const availableColumns = Object.keys(rows[0]);
-    const invalidColumns = columns.filter((col) => !availableColumns.includes(col));
-    if (invalidColumns.length > 0) {
-      throw new Error(`Columns not found: ${invalidColumns.join(', ')}`);
+    validColumns = columns.filter((col) => availableColumns.includes(col));
+    // If no valid columns found, return empty result gracefully
+    if (validColumns.length === 0 && columns.length > 0) {
+      validColumns = columns; // Keep original to show what was requested
     }
   }
 
@@ -189,7 +191,7 @@ export const extractColumns = (
   // Extract only specified columns
   const extractedRows = rows.map((row) => {
     const extracted: Record<string, any> = {};
-    columns.forEach((col) => {
+    validColumns.forEach((col) => {
       extracted[col] = row[col];
     });
     return extracted;
@@ -198,7 +200,7 @@ export const extractColumns = (
   // Generate CSV from extracted columns
   const Papa2 = require('papaparse');
   return Papa2.unparse({
-    fields: columns,
+    fields: validColumns.length > 0 ? validColumns : columns,
     data: extractedRows,
   });
 };

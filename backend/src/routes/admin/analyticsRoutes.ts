@@ -61,10 +61,10 @@ router.get('/revenue', authenticateToken, requireAdmin, async (req: AuthRequest,
       cancelledSubscriptions: await prisma.subscription.count({
         where: { status: 'CANCELLED' }
       }),
-      pendingPayments: await prisma.billingRecord.aggregate({
+      pendingPayments: (await prisma.billingRecord.aggregate({
         where: { status: 'PENDING' },
         _sum: { amount: true }
-      })._sum.amount || 0,
+      }))._sum.amount || 0,
       churnRate: 0 // Calculate based on cancellations
     };
 

@@ -125,8 +125,10 @@ export const validateUserRegistration = (
 ): { valid: boolean; errors: string[] } => {
   const errors: string[] = [];
 
-  if (!data.email || !validateEmail(data.email)) {
-    errors.push('Valid email is required');
+  if (!data.email) {
+    errors.push('Email is required');
+  } else if (!validateEmail(data.email)) {
+    errors.push('Invalid email address');
   }
 
   if (!data.password) {
@@ -154,8 +156,10 @@ export const validateUserRegistration = (
 export const validateUserLogin = (data: any): { valid: boolean; errors: string[] } => {
   const errors: string[] = [];
 
-  if (!data.email || !validateEmail(data.email)) {
-    errors.push('Valid email is required');
+  if (!data.email) {
+    errors.push('Email is required');
+  } else if (!validateEmail(data.email)) {
+    errors.push('Invalid email address');
   }
 
   if (!data.password) {

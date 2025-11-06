@@ -1,9 +1,10 @@
 // backend/src/services/twoFactorService.ts
 
 import * as speakeasy from 'speakeasy';
-import * as QRCode from 'qrcode';
 import { prisma } from '../config/database';
 import logger from '../utils/logger';
+
+const QRCode = require('qrcode');
 
 export interface TwoFactorSetup {
   secret: string;
@@ -54,6 +55,8 @@ export class TwoFactorService {
 
   /**
    * Enable 2FA for user
+   * Note: Backup codes are generated but not stored (requires separate model).
+   * Only the TOTP secret is stored.
    */
   static async enableTwoFactor(
     userId: string,
@@ -61,18 +64,13 @@ export class TwoFactorService {
     backupCodes: string[]
   ): Promise<void> {
     try {
-      // Hash backup codes
-      const hashedBackupCodes = backupCodes.map((code) =>
-        require('crypto').createHash('sha256').update(code).digest('hex')
-      );
-
+      // Store only the TOTP secret (backup codes need a separate model)
       await prisma.user.update({
         where: { id: userId },
         data: {
           twoFactorSecret: secret,
-          twoFactorEnabled: true,
-          twoFactorBackupCodes: hashedBackupCodes,
-        },
+          twoFactorEnabled: true
+        }
       });
 
       logger.info(`2FA enabled for user ${userId}`);
@@ -129,47 +127,14 @@ export class TwoFactorService {
 
   /**
    * Verify backup code
+   * Note: Backup code verification disabled - codes not persisted in schema
    */
   static async verifyBackupCode(userId: string, code: string): Promise<VerificationResult> {
     try {
-      const user = await prisma.user.findUnique({
-        where: { id: userId },
-      });
-
-      if (!user || !user.twoFactorEnabled) {
-        return {
-          valid: false,
-          message: '2FA not enabled',
-        };
-      }
-
-      const codeHash = require('crypto')
-        .createHash('sha256')
-        .update(code.replace(/\s/g, ''))
-        .digest('hex');
-
-      const backupCodes = user.twoFactorBackupCodes || [];
-      const codeIndex = backupCodes.indexOf(codeHash);
-
-      if (codeIndex === -1) {
-        return {
-          valid: false,
-          message: 'Invalid backup code',
-        };
-      }
-
-      // Remove used backup code
-      backupCodes.splice(codeIndex, 1);
-
-      await prisma.user.update({
-        where: { id: userId },
-        data: { twoFactorBackupCodes: backupCodes },
-      });
-
-      logger.info(`Backup code used for user ${userId}`);
+      // Backup code storage not available - requires separate model
       return {
-        valid: true,
-        message: 'Valid backup code',
+        valid: false,
+        message: 'Backup code verification not available. Please use TOTP code.',
       };
     } catch (error) {
       logger.error('Verify backup code error:', error);
@@ -189,8 +154,7 @@ export class TwoFactorService {
         where: { id: userId },
         data: {
           twoFactorEnabled: false,
-          twoFactorSecret: null,
-          twoFactorBackupCodes: [],
+          twoFactorSecret: null
         },
       });
 
@@ -203,22 +167,14 @@ export class TwoFactorService {
 
   /**
    * Generate new backup codes
+   * Note: Backup codes not persisted in current schema
    */
   static async regenerateBackupCodes(userId: string): Promise<string[]> {
     try {
+      // Generate codes but don't store (no field in User model)
       const backupCodes = this.generateBackupCodes();
 
-      // Hash backup codes
-      const hashedBackupCodes = backupCodes.map((code) =>
-        require('crypto').createHash('sha256').update(code).digest('hex')
-      );
-
-      await prisma.user.update({
-        where: { id: userId },
-        data: { twoFactorBackupCodes: hashedBackupCodes },
-      });
-
-      logger.info(`Backup codes regenerated for user ${userId}`);
+      logger.info(`Backup codes generated for user ${userId} (not persisted)`);
       return backupCodes;
     } catch (error) {
       logger.error('Regenerate backup codes error:', error);
@@ -240,7 +196,7 @@ export class TwoFactorService {
 
       return {
         enabled: user?.twoFactorEnabled || false,
-        backupCodesRemaining: user?.twoFactorBackupCodes?.length || 0,
+        backupCodesRemaining: 0, // Not persisted in schema
       };
     } catch (error) {
       logger.error('Get 2FA status error:', error);

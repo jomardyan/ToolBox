@@ -2,21 +2,23 @@
   "preset": "ts-jest",
   "testEnvironment": "node",
   "roots": ["<rootDir>/src"],
-  "testMatch": ["**/__tests__/**/*.ts", "**/?(*.)+(spec|test).ts"],
+  "testMatch": ["**/__tests__/**/*.test.ts", "**/__tests__/**/*.spec.ts", "**/?(*.)+(spec|test).ts"],
+  "testPathIgnorePatterns": ["setup.ts"],
   "moduleFileExtensions": ["ts", "js", "json"],
   "collectCoverage": true,
   "collectCoverageFrom": [
     "src/**/*.ts",
     "!src/index.ts",
     "!src/types/**",
-    "!src/**/*.d.ts"
+    "!src/**/*.d.ts",
+    "!src/__tests__/**"
   ],
   "coverageThreshold": {
     "global": {
-      "branches": 0,
-      "functions": 0,
-      "lines": 0,
-      "statements": 0
+      "branches": 70,
+      "functions": 70,
+      "lines": 70,
+      "statements": 70
     }
   },
   "moduleNameMapper": {

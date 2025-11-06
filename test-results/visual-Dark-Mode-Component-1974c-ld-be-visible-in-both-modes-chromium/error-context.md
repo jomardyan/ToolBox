@@ -13,14 +13,14 @@
       - navigation [ref=e10]:
         - link "Home" [ref=e11] [cursor=pointer]:
           - /url: /
-        - link "History" [ref=e12] [cursor=pointer]:
+        - link "Converter" [ref=e12] [cursor=pointer]:
+          - /url: /converter
+        - link "History" [ref=e13] [cursor=pointer]:
           - /url: /history
-        - link "Advanced" [ref=e13] [cursor=pointer]:
-          - /url: /advanced
         - link "FAQ" [ref=e14] [cursor=pointer]:
           - /url: /faq
         - generic [ref=e15]:
-          - button "Toggle dark mode" [active] [ref=e16] [cursor=pointer]: ☀️
+          - switch "Switch to light mode" [checked] [active] [ref=e16] [cursor=pointer]: ☀️
           - link "Login" [ref=e17] [cursor=pointer]:
             - /url: /login
           - link "Sign Up" [ref=e18] [cursor=pointer]:

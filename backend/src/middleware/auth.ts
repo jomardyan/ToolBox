@@ -191,6 +191,100 @@ export const requireAdmin = (req: AuthRequest, res: Response, next: NextFunction
 };
 
 /**
+ * Middleware to authenticate using either JWT token or API key
+ */
+export const authenticateTokenOrApiKey = async (req: AuthRequest, res: Response, next: NextFunction) => {
+  const requestId = (req as any).requestId || 'unknown';
+  
+  // Try JWT token first
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+  
+  if (token) {
+    try {
+      const decoded = CryptoUtils.verifyAccessToken(token);
+      if (decoded) {
+        req.user = decoded;
+        return next();
+      }
+    } catch (error) {
+      logger.debug(`JWT verification failed: ${error}`);
+      // Fall through to API key check
+    }
+  }
+  
+  // Try API key
+  const apiKey = req.headers['x-api-key'] as string;
+  if (apiKey) {
+    try {
+      // Validate API key format (should start with sk_)
+      if (!apiKey.startsWith('sk_')) {
+        return res.status(401).json({
+          success: false,
+          error: 'Invalid API key format',
+          statusCode: 401
+        });
+      }
+
+      // Hash the API key and look it up in database
+      const keyHash = CryptoUtils.hashApiKey(apiKey);
+
+      const { PrismaClient } = await import('@prisma/client');
+      const prisma = new PrismaClient();
+
+      try {
+        const apiKeyRecord = await prisma.apiKey.findUnique({
+          where: { keyHash }
+        });
+
+        if (!apiKeyRecord) {
+          logger.warn(`[${requestId}] API key authentication failed: Key not found`);
+          return res.status(401).json({
+            success: false,
+            error: 'Invalid API key',
+            statusCode: 401
+          });
+        }
+
+        if (apiKeyRecord.revokedAt) {
+          logger.warn(`[${requestId}] API key authentication failed: Key revoked`);
+          return res.status(401).json({
+            success: false,
+            error: 'API key has been revoked',
+            statusCode: 401
+          });
+        }
+
+        req.user = {
+          userId: apiKeyRecord.userId,
+          email: apiKeyRecord.userId, // Will be fetched from user if needed
+          role: 'user' // Default role for API key authentication
+        };
+        await prisma.$disconnect();
+        return next();
+      } catch (dbError) {
+        await prisma.$disconnect();
+        throw dbError;
+      }
+    } catch (error) {
+      logger.error(`API key verification error: ${error}`);
+      return res.status(401).json({
+        success: false,
+        error: 'Authentication failed',
+        statusCode: 401
+      });
+    }
+  }
+  
+  // No authentication provided
+  return res.status(401).json({
+    success: false,
+    error: 'No token or API key provided',
+    statusCode: 401
+  });
+};
+
+/**
  * Middleware to check if user is authenticated
  */
 export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction) => {
@@ -207,6 +301,7 @@ export const requireAuth = (req: AuthRequest, res: Response, next: NextFunction)
 export default {
   authenticateToken,
   authenticateApiKey,
+  authenticateTokenOrApiKey,
   requireAdmin,
   requireAuth
 };

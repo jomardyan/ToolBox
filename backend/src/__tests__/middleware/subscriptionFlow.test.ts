@@ -71,14 +71,14 @@ describe('Subscription Mechanism Integration', () => {
     testToken = tokens.accessToken;
 
     // Create API key
-    testApiKey = CryptoUtils.generateApiKey();
-    const keyHash = CryptoUtils.hashApiKey(testApiKey);
+    const apiKeyData = CryptoUtils.generateApiKey();
+    testApiKey = apiKeyData.key;
     await prisma.apiKey.create({
       data: {
         userId: testUser.id,
         name: 'Test API Key',
-        keyHash,
-        keyPrefix: testApiKey.substring(0, 12)
+        keyHash: apiKeyData.hash,
+        keyPrefix: apiKeyData.prefix
       }
     });
   });

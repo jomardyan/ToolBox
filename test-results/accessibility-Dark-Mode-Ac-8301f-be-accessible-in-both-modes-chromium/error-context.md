@@ -13,14 +13,14 @@
       - navigation [ref=e10]:
         - link "Home" [ref=e11] [cursor=pointer]:
           - /url: /
-        - link "History" [ref=e12] [cursor=pointer]:
+        - link "Converter" [ref=e12] [cursor=pointer]:
+          - /url: /converter
+        - link "History" [ref=e13] [cursor=pointer]:
           - /url: /history
-        - link "Advanced" [ref=e13] [cursor=pointer]:
-          - /url: /advanced
         - link "FAQ" [ref=e14] [cursor=pointer]:
           - /url: /faq
         - generic [ref=e15]:
-          - button "Toggle dark mode" [ref=e16] [cursor=pointer]: 🌙
+          - switch "Switch to dark mode" [ref=e16] [cursor=pointer]: 🌙
           - link "Login" [ref=e17] [cursor=pointer]:
             - /url: /login
           - link "Sign Up" [ref=e18] [cursor=pointer]:
@@ -38,13 +38,15 @@
             - generic [ref=e34]:
               - generic:
                 - img
-              - textbox "you@example.com" [ref=e35]
+              - textbox "Email Address" [ref=e35]:
+                - /placeholder: you@example.com
           - generic [ref=e36]:
             - generic [ref=e37]: Password
             - generic [ref=e38]:
               - generic:
                 - img
-              - textbox "••••••••" [ref=e39]
+              - textbox "Password" [active] [ref=e39]:
+                - /placeholder: ••••••••
           - generic [ref=e40]:
             - generic [ref=e41] [cursor=pointer]:
               - checkbox "Remember me" [ref=e42]

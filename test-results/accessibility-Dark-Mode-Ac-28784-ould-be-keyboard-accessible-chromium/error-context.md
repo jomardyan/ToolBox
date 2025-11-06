@@ -13,126 +13,256 @@
       - navigation [ref=e10]:
         - link "Home" [ref=e11] [cursor=pointer]:
           - /url: /
-        - link "History" [ref=e12] [cursor=pointer]:
+        - link "Converter" [ref=e12] [cursor=pointer]:
+          - /url: /converter
+        - link "History" [ref=e13] [cursor=pointer]:
           - /url: /history
-        - link "Advanced" [ref=e13] [cursor=pointer]:
-          - /url: /advanced
         - link "FAQ" [ref=e14] [cursor=pointer]:
           - /url: /faq
         - generic [ref=e15]:
-          - button "Toggle dark mode" [ref=e16] [cursor=pointer]: 🌙
+          - switch "Switch to dark mode" [ref=e16] [cursor=pointer]: 🌙
           - link "Login" [ref=e17] [cursor=pointer]:
             - /url: /login
           - link "Sign Up" [ref=e18] [cursor=pointer]:
             - /url: /register
-  - generic [ref=e20]:
-    - generic [ref=e21]:
-      - generic [ref=e23]: 🚀 Fast & Secure Conversion
-      - heading "Universal File Converter" [level=1] [ref=e24]
-      - paragraph [ref=e25]:
-        - text: Seamlessly convert between CSV, JSON, XML, YAML, and more.
-        - text: Fast, secure, and browser-based.
-      - generic [ref=e26]:
-        - generic [ref=e27]:
-          - generic [ref=e28]: ✓
-          - generic [ref=e29]: No Upload Required
-        - generic [ref=e30]:
-          - generic [ref=e31]: ✓
-          - generic [ref=e32]: 100% Privacy
-        - generic [ref=e33]:
-          - generic [ref=e34]: ✓
-          - generic [ref=e35]: Lightning Fast
-    - generic [ref=e36]:
-      - generic [ref=e37]:
-        - heading "📥 Input" [level=2] [ref=e40]:
-          - generic [ref=e41]: 📥
-          - generic [ref=e42]: Input
-        - generic [ref=e43]:
-          - generic [ref=e45]:
-            - generic [ref=e46]: Source Format
-            - generic [ref=e47]:
-              - button "CSV" [ref=e48] [cursor=pointer]
-              - button "JSON" [ref=e49] [cursor=pointer]
-              - button "XML" [ref=e50] [cursor=pointer]
-              - button "YAML" [ref=e51] [cursor=pointer]
-              - button "HTML" [ref=e52] [cursor=pointer]
-              - button "TABLE" [ref=e53] [cursor=pointer]
-              - button "TSV" [ref=e54] [cursor=pointer]
-              - button "KML" [ref=e55] [cursor=pointer]
-              - button "TXT" [ref=e56] [cursor=pointer]
-              - button "MARKDOWN" [ref=e57] [cursor=pointer]
-              - button "JSONL" [ref=e58] [cursor=pointer]
-              - button "NDJSON" [ref=e59] [cursor=pointer]
-              - button "LINES" [ref=e60] [cursor=pointer]
-              - button "ICS" [ref=e61] [cursor=pointer]
-              - button "TOML" [ref=e62] [cursor=pointer]
-              - button "EXCEL" [ref=e63] [cursor=pointer]
-              - button "SQL" [ref=e64] [cursor=pointer]
-          - generic [ref=e65]:
-            - generic [ref=e66]: Upload or Paste Data
-            - generic [ref=e67] [cursor=pointer]:
-              - generic [ref=e68]: 📁
-              - heading "Drag and drop your file" [level=5] [ref=e69]
-              - paragraph [ref=e70]: or click to browse your computer
-              - generic [ref=e71]: "Max size: 100MB"
-          - generic [ref=e72]:
-            - generic [ref=e73]: "Or paste your data:"
-            - textbox "Paste your data here..." [ref=e74]
-          - generic [ref=e75]:
-            - button "Convert" [ref=e76] [cursor=pointer]:
-              - img [ref=e77]
-              - text: Convert
-            - button "Clear" [disabled] [ref=e79]:
-              - img [ref=e80]
-              - text: Clear
-      - generic [ref=e82]:
-        - heading "📤 Output" [level=2] [ref=e85]:
-          - generic [ref=e86]: 📤
-          - generic [ref=e87]: Output
+  - generic [ref=e19]:
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - img [ref=e26]
+        - generic [ref=e28]: Trusted by 5,000+ developers worldwide
+      - heading "The Modern API for Data Conversion" [level=1] [ref=e29]:
+        - text: The Modern API for
+        - text: Data Conversion
+      - paragraph [ref=e30]: Convert between CSV, JSON, XML, YAML, and more with a single API call. Built for developers who demand speed, reliability, and simplicity.
+      - generic [ref=e31]:
+        - link "Start Free Trial" [ref=e32] [cursor=pointer]:
+          - /url: /register
+          - text: Start Free Trial
+          - img [ref=e33]
+        - link "View Documentation" [ref=e35] [cursor=pointer]:
+          - /url: /api-docs
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - img [ref=e38]
+          - generic [ref=e40]: No credit card required
+        - generic [ref=e41]:
+          - img [ref=e42]
+          - generic [ref=e44]: 1,000 free calls/month
+        - generic [ref=e45]:
+          - img [ref=e46]
+          - generic [ref=e48]: Cancel anytime
+    - generic [ref=e51]:
+      - generic [ref=e52]:
+        - generic [ref=e53]: 10M+
+        - generic [ref=e54]: API Calls/Month
+      - generic [ref=e55]:
+        - generic [ref=e56]: 5,000+
+        - generic [ref=e57]: Active Developers
+      - generic [ref=e58]:
+        - generic [ref=e59]: 99.9%
+        - generic [ref=e60]: Uptime
+      - generic [ref=e61]:
+        - generic [ref=e62]: <100ms
+        - generic [ref=e63]: Avg Response Time
+    - generic [ref=e65]:
+      - generic [ref=e66]:
+        - heading "Built for Modern Development" [level=2] [ref=e67]
+        - paragraph [ref=e68]: Everything you need to integrate data conversion into your applications
+      - generic [ref=e69]:
+        - generic [ref=e70]:
+          - img [ref=e72]
+          - heading "Developer-First API" [level=3] [ref=e74]
+          - paragraph [ref=e75]: Clean, intuitive REST API with comprehensive documentation and code examples in multiple languages.
+        - generic [ref=e76]:
+          - img [ref=e78]
+          - heading "Lightning Fast" [level=3] [ref=e80]
+          - paragraph [ref=e81]: Optimized infrastructure delivering responses in milliseconds. Built for performance at scale.
+        - generic [ref=e82]:
+          - img [ref=e84]
+          - heading "Enterprise Security" [level=3] [ref=e86]
+          - paragraph [ref=e87]: Bank-level encryption, SOC 2 compliant, with IP whitelisting and custom security options.
         - generic [ref=e88]:
-          - generic [ref=e90]:
-            - generic [ref=e91]: Target Format
-            - generic [ref=e92]:
-              - button "CSV" [ref=e93] [cursor=pointer]
-              - button "JSON" [ref=e94] [cursor=pointer]
-              - button "XML" [ref=e95] [cursor=pointer]
-              - button "YAML" [ref=e96] [cursor=pointer]
-              - button "HTML" [ref=e97] [cursor=pointer]
-              - button "TABLE" [ref=e98] [cursor=pointer]
-              - button "TSV" [ref=e99] [cursor=pointer]
-              - button "KML" [ref=e100] [cursor=pointer]
-              - button "TXT" [ref=e101] [cursor=pointer]
-              - button "MARKDOWN" [ref=e102] [cursor=pointer]
-              - button "JSONL" [ref=e103] [cursor=pointer]
-              - button "NDJSON" [ref=e104] [cursor=pointer]
-              - button "LINES" [ref=e105] [cursor=pointer]
-              - button "ICS" [ref=e106] [cursor=pointer]
-              - button "TOML" [ref=e107] [cursor=pointer]
-              - button "EXCEL" [ref=e108] [cursor=pointer]
-              - button "SQL" [ref=e109] [cursor=pointer]
-          - generic [ref=e110]:
-            - generic [ref=e111]: Converted Result
-            - textbox "Your converted data will appear here..." [ref=e112]
-          - generic [ref=e113]:
-            - button "Download" [disabled] [ref=e114]:
-              - img [ref=e115]
-              - text: Download
-            - button "Copy" [disabled] [ref=e117]:
-              - img [ref=e118]
-              - text: Copy
-    - generic [ref=e120]:
-      - heading "Why Choose Our Converter?" [level=2] [ref=e121]
-      - generic [ref=e122]:
-        - generic [ref=e123]:
-          - generic [ref=e124]: 🔒
-          - heading "100% Secure" [level=3] [ref=e125]
-          - paragraph [ref=e126]: All conversions happen locally in your browser. Your data never leaves your device.
-        - generic [ref=e127]:
-          - generic [ref=e128]: ⚡
-          - heading "Lightning Fast" [level=3] [ref=e129]
-          - paragraph [ref=e130]: Instant conversion with optimized algorithms. No waiting, no server delays.
-        - generic [ref=e131]:
-          - generic [ref=e132]: 🎯
-          - heading "Multiple Formats" [level=3] [ref=e133]
-          - paragraph [ref=e134]: Support for CSV, JSON, XML, YAML, and more. One tool for all your conversion needs.
+          - img [ref=e90]
+          - heading "Advanced Analytics" [level=3] [ref=e92]
+          - paragraph [ref=e93]: Real-time usage metrics, performance monitoring, and detailed reporting dashboards.
+        - generic [ref=e94]:
+          - img [ref=e96]
+          - heading "World-Class Support" [level=3] [ref=e98]
+          - paragraph [ref=e99]: Dedicated support team with fast response times. Priority support for business plans.
+        - generic [ref=e100]:
+          - img [ref=e102]
+          - heading "99.9% Uptime SLA" [level=3] [ref=e104]
+          - paragraph [ref=e105]: Reliable infrastructure with guaranteed uptime and automatic failover protection.
+    - generic [ref=e107]:
+      - generic [ref=e108]:
+        - heading "Simple, Transparent Pricing" [level=2] [ref=e109]
+        - paragraph [ref=e110]: Start free, scale as you grow. No hidden fees, no surprises.
+      - generic [ref=e111]:
+        - generic [ref=e113]:
+          - heading "Free" [level=3] [ref=e114]
+          - generic [ref=e115]:
+            - generic [ref=e116]: $0
+            - generic [ref=e117]: /forever
+          - paragraph [ref=e118]: Perfect for developers and small projects
+          - link "Get Started" [ref=e119] [cursor=pointer]:
+            - /url: /register
+          - list [ref=e120]:
+            - listitem [ref=e121]:
+              - img [ref=e122]
+              - generic [ref=e124]: 1,000 API calls/month
+            - listitem [ref=e125]:
+              - img [ref=e126]
+              - generic [ref=e128]: 10 MB file size limit
+            - listitem [ref=e129]:
+              - img [ref=e130]
+              - generic [ref=e132]: Basic conversion operations
+            - listitem [ref=e133]:
+              - img [ref=e134]
+              - generic [ref=e136]: Community support
+            - listitem [ref=e137]:
+              - img [ref=e138]
+              - generic [ref=e140]: 10 requests/minute
+            - listitem [ref=e141]:
+              - img [ref=e142]
+              - generic [ref=e144]: API documentation
+        - generic [ref=e146]:
+          - heading "Starter" [level=3] [ref=e147]
+          - generic [ref=e148]:
+            - generic [ref=e149]: $29
+            - generic [ref=e150]: /month
+          - paragraph [ref=e151]: For small businesses and indie developers
+          - link "Start Free Trial" [ref=e152] [cursor=pointer]:
+            - /url: /register
+          - list [ref=e153]:
+            - listitem [ref=e154]:
+              - img [ref=e155]
+              - generic [ref=e157]: 50,000 API calls/month
+            - listitem [ref=e158]:
+              - img [ref=e159]
+              - generic [ref=e161]: 50 MB file size limit
+            - listitem [ref=e162]:
+              - img [ref=e163]
+              - generic [ref=e165]: All conversion formats
+            - listitem [ref=e166]:
+              - img [ref=e167]
+              - generic [ref=e169]: Email support (48h)
+            - listitem [ref=e170]:
+              - img [ref=e171]
+              - generic [ref=e173]: 30 requests/minute
+            - listitem [ref=e174]:
+              - img [ref=e175]
+              - generic [ref=e177]: 5 API keys
+            - listitem [ref=e178]:
+              - img [ref=e179]
+              - generic [ref=e181]: Basic analytics dashboard
+            - listitem [ref=e182]:
+              - img [ref=e183]
+              - generic [ref=e185]: 99.5% uptime SLA
+        - generic [ref=e186]:
+          - generic [ref=e187]: Most Popular
+          - generic [ref=e188]:
+            - heading "Professional" [level=3] [ref=e189]
+            - generic [ref=e190]:
+              - generic [ref=e191]: $99
+              - generic [ref=e192]: /month
+            - paragraph [ref=e193]: For growing businesses and agencies
+            - link "Start Free Trial" [ref=e194] [cursor=pointer]:
+              - /url: /register
+            - list [ref=e195]:
+              - listitem [ref=e196]:
+                - img [ref=e197]
+                - generic [ref=e199]: 250,000 API calls/month
+              - listitem [ref=e200]:
+                - img [ref=e201]
+                - generic [ref=e203]: 100 MB file size limit
+              - listitem [ref=e204]:
+                - img [ref=e205]
+                - generic [ref=e207]: All conversion formats
+              - listitem [ref=e208]:
+                - img [ref=e209]
+                - generic [ref=e211]: Priority email support (24h)
+              - listitem [ref=e212]:
+                - img [ref=e213]
+                - generic [ref=e215]: 60 requests/minute
+              - listitem [ref=e216]:
+                - img [ref=e217]
+                - generic [ref=e219]: 20 API keys
+              - listitem [ref=e220]:
+                - img [ref=e221]
+                - generic [ref=e223]: Advanced analytics
+              - listitem [ref=e224]:
+                - img [ref=e225]
+                - generic [ref=e227]: Webhook notifications
+              - listitem [ref=e228]:
+                - img [ref=e229]
+                - generic [ref=e231]: 99.9% uptime SLA
+              - listitem [ref=e232]:
+                - img [ref=e233]
+                - generic [ref=e235]: Custom rate limits
+        - generic [ref=e237]:
+          - heading "Business" [level=3] [ref=e238]
+          - generic [ref=e239]:
+            - generic [ref=e240]: $299
+            - generic [ref=e241]: /month
+          - paragraph [ref=e242]: For large enterprises and high-volume users
+          - link "Start Free Trial" [ref=e243] [cursor=pointer]:
+            - /url: /register
+          - list [ref=e244]:
+            - listitem [ref=e245]:
+              - img [ref=e246]
+              - generic [ref=e248]: 1,000,000 API calls/month
+            - listitem [ref=e249]:
+              - img [ref=e250]
+              - generic [ref=e252]: 500 MB file size limit
+            - listitem [ref=e253]:
+              - img [ref=e254]
+              - generic [ref=e256]: All conversion formats
+            - listitem [ref=e257]:
+              - img [ref=e258]
+              - generic [ref=e260]: Priority support (4h)
+            - listitem [ref=e261]:
+              - img [ref=e262]
+              - generic [ref=e264]: 120 requests/minute
+            - listitem [ref=e265]:
+              - img [ref=e266]
+              - generic [ref=e268]: Unlimited API keys
+            - listitem [ref=e269]:
+              - img [ref=e270]
+              - generic [ref=e272]: Advanced analytics & reporting
+            - listitem [ref=e273]:
+              - img [ref=e274]
+              - generic [ref=e276]: Webhook notifications
+            - listitem [ref=e277]:
+              - img [ref=e278]
+              - generic [ref=e280]: Dedicated account manager
+            - listitem [ref=e281]:
+              - img [ref=e282]
+              - generic [ref=e284]: 99.95% uptime SLA
+            - listitem [ref=e285]:
+              - img [ref=e286]
+              - generic [ref=e288]: Custom integrations
+            - listitem [ref=e289]:
+              - img [ref=e290]
+              - generic [ref=e292]: IP whitelisting
+      - generic [ref=e293]:
+        - paragraph [ref=e294]: Need custom volume or on-premise deployment?
+        - link "Contact Sales for Enterprise" [ref=e295] [cursor=pointer]:
+          - /url: /contact
+    - generic [ref=e297]:
+      - heading "Ready to Get Started?" [level=2] [ref=e298]
+      - paragraph [ref=e299]: Join thousands of developers building with our API. Start converting data in minutes.
+      - generic [ref=e300]:
+        - link "Start Free Trial" [ref=e301] [cursor=pointer]:
+          - /url: /register
+          - text: Start Free Trial
+          - img [ref=e302]
+        - link "View API Docs" [ref=e304] [cursor=pointer]:
+          - /url: /api-docs
+    - generic [ref=e307]:
+      - paragraph [ref=e308]: TRUSTED BY DEVELOPERS AT
+      - generic [ref=e309]:
+        - generic [ref=e310]: Company A
+        - generic [ref=e311]: Company B
+        - generic [ref=e312]: Company C
+        - generic [ref=e313]: Company D
 ```

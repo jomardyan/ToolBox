@@ -1,7 +1,7 @@
 // backend/src/routes/accountRoutes.ts
 
 import { Router, Response } from 'express';
-import { authenticateToken } from '../middleware/auth';
+import { authenticateTokenOrApiKey, authenticateToken } from '../middleware/auth';
 import { AuthRequest } from '../types/auth';
 import { prisma } from '../config/database';
 import CryptoUtils from '../utils/cryptoUtils';
@@ -14,10 +14,60 @@ import * as path from 'path';
 const router = Router();
 
 /**
+ * Get user account (root - returns profile data)
+ * GET /api/user/account
+ */
+router.get('/', authenticateTokenOrApiKey, async (req: AuthRequest, res: Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({
+        success: false,
+        error: 'Not authenticated',
+        statusCode: 401
+      });
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { id: req.user.userId },
+      select: {
+        id: true,
+        email: true,
+        firstName: true,
+        lastName: true,
+        status: true,
+        createdAt: true,
+        emailVerified: true
+      }
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        error: 'User not found',
+        statusCode: 404
+      });
+    }
+
+    res.json({
+      success: true,
+      data: user,
+      statusCode: 200
+    });
+  } catch (error: any) {
+    logger.error('Get account error:', error);
+    res.status(500).json({
+      success: false,
+      error: 'Failed to get account',
+      statusCode: 500
+    });
+  }
+});
+
+/**
  * Get user profile
  * GET /api/user/account/profile
  */
-router.get('/profile', authenticateToken, async (req: AuthRequest, res: Response) => {
+router.get('/profile', authenticateTokenOrApiKey, async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({

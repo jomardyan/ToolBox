@@ -35,14 +35,14 @@ export const quotaEnforcementMiddleware = async (req: Request, res: Response, ne
         }
       });
 
-      // If no subscription, apply free tier limits
-      const monthlyLimit = subscription?.plan?.monthlyLimit || 1000; // Default 1000 for free tier
-
-      // If plan has unlimited quota (null), skip check
-      if (monthlyLimit === null) {
+      // If plan has unlimited quota (explicitly null), skip check
+      if (subscription?.plan?.monthlyLimit === null) {
         await prisma.$disconnect();
         return next();
       }
+
+      // If no subscription, apply free tier limits
+      const monthlyLimit = subscription?.plan?.monthlyLimit ?? 1000; // Default 1000 for free tier
 
       // Get current billing cycle dates
       const now = new Date();

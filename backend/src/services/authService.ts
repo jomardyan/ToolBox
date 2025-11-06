@@ -10,8 +10,8 @@ export class AuthService {
   /**
    * Convert database role (uppercase) to JWT role (lowercase)
    */
-  private static normalizeRole(dbRole: string): 'admin' | 'user' {
-    return dbRole.toLowerCase() as 'admin' | 'user';
+  private static normalizeRole(dbRole: string | undefined | null): 'admin' | 'user' {
+    return (dbRole?.toLowerCase() ?? 'user') as 'admin' | 'user';
   }
   /**
    * Register a new user
