@@ -6,8 +6,19 @@ import jwt from 'jsonwebtoken';
 import { JwtPayload, TokenPair } from '../types/auth';
 
 const SALT_ROUNDS = 12;
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-in-prod';
-const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'your-refresh-secret-change-in-prod';
+
+// Critical: Require JWT secrets to be set, fail fast if missing (skip in test environment)
+if (process.env.NODE_ENV !== 'test') {
+  if (!process.env.JWT_SECRET || process.env.JWT_SECRET === 'your-secret-key-change-in-prod') {
+    throw new Error('JWT_SECRET environment variable must be set to a secure random value');
+  }
+  if (!process.env.JWT_REFRESH_SECRET || process.env.JWT_REFRESH_SECRET === 'your-refresh-secret-change-in-prod') {
+    throw new Error('JWT_REFRESH_SECRET environment variable must be set to a secure random value');
+  }
+}
+
+const JWT_SECRET = process.env.JWT_SECRET || 'test-secret-for-testing-only';
+const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'test-refresh-secret-for-testing-only';
 const JWT_EXPIRATION = process.env.JWT_EXPIRATION || '15m';
 const JWT_REFRESH_EXPIRATION = process.env.JWT_REFRESH_EXPIRATION || '7d';
 

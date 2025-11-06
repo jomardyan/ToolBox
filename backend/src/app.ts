@@ -6,7 +6,11 @@ import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import compression from 'compression';
 import rateLimit from 'express-rate-limit';
+import crypto from 'crypto';
 import logger from './utils/logger';
+import metricsCollector from './utils/metricsCollector';
+import usageTrackingMiddleware from './middleware/usageTracking';
+import quotaEnforcementMiddleware from './middleware/quotaEnforcement';
 
 // Import routes
 import authRoutes from './routes/authRoutes';
@@ -21,13 +25,34 @@ import adminPlansRoutes from './routes/admin/plansRoutes';
 import webhookRoutes from './routes/webhookRoutes';
 import oauthRoutes from './routes/oauthRoutes';
 import twoFactorRoutes from './routes/twoFactorRoutes';
+import metricsRoutes from './routes/metricsRoutes';
 
 const app: Express = express();
 
 // ===== Middleware =====
 
-// Security middleware
-app.use(helmet());
+// Security middleware with enhanced configuration
+app.use(helmet({
+  hsts: {
+    maxAge: 31536000, // 1 year in seconds
+    includeSubDomains: true,
+    preload: true
+  },
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"]
+    }
+  },
+  referrerPolicy: { policy: 'strict-origin-when-cross-origin' }
+}));
 app.use(compression());
 
 // CORS configuration
@@ -45,28 +70,66 @@ app.use(express.urlencoded({ limit: '10mb', extended: true }));
 // Cookie parser
 app.use(cookieParser());
 
-// Rate limiting
+// Request ID tracking middleware (must be early in chain)
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const requestId = req.headers['x-request-id'] as string || crypto.randomUUID();
+  (req as any).requestId = requestId;
+  res.setHeader('X-Request-ID', requestId);
+  next();
+});
+
+// Rate limiting with headers
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.'
+  message: 'Too many requests from this IP, please try again later.',
+  standardHeaders: true, // Return rate limit info in RateLimit-* headers
+  legacyHeaders: false, // Disable X-RateLimit-* headers
+  handler: (req: Request, res: Response) => {
+    logger.warn(`Rate limit exceeded for IP: ${req.ip}, RequestID: ${(req as any).requestId}`);
+    res.status(429).json({
+      success: false,
+      error: 'Too many requests, please try again later',
+      statusCode: 429,
+      requestId: (req as any).requestId
+    });
+  }
 });
 app.use('/api/', limiter);
 
-// Request logging middleware
+// Request logging middleware with request ID
 app.use((req: Request, res: Response, next: NextFunction) => {
-  logger.info(`${req.method} ${req.path}`);
+  const startTime = Date.now();
+  logger.info(`[${(req as any).requestId}] ${req.method} ${req.path}`);
+  
+  // Track metrics on response finish
+  res.on('finish', () => {
+    const duration = Date.now() - startTime;
+    metricsCollector.trackRequest(req.method, req.path, res.statusCode, duration);
+  });
+  
   next();
 });
+
+// Usage tracking middleware (for billing and analytics)
+app.use(usageTrackingMiddleware);
+
+// Quota enforcement middleware (check monthly limits)
+app.use(quotaEnforcementMiddleware);
 
 // ===== Health Check =====
 app.get('/health', (req: Request, res: Response) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    version: process.env.npm_package_version || '1.0.0',
+    environment: process.env.NODE_ENV || 'development'
   });
 });
+
+// Metrics endpoint
+app.use('/api/metrics', metricsRoutes);
 
 // ===== API Routes =====
 
@@ -106,18 +169,32 @@ app.use((req: Request, res: Response) => {
   });
 });
 
-// Global error handler
+// Global error handler - never expose stack traces
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
-  logger.error('Unhandled error:', err);
+  const requestId = (req as any).requestId || 'unknown';
+  
+  // Log full error details internally
+  logger.error(`[${requestId}] Unhandled error:`, {
+    error: err.message,
+    stack: err.stack,
+    statusCode: err.statusCode,
+    path: req.path,
+    method: req.method
+  });
 
   const statusCode = err.statusCode || 500;
-  const message = err.message || 'Internal server error';
+  
+  // Generic error messages for production
+  const clientMessage = statusCode >= 500 
+    ? 'An internal error occurred. Please contact support with request ID.' 
+    : err.message || 'Request failed';
 
   res.status(statusCode).json({
     success: false,
-    error: message,
+    error: clientMessage,
     statusCode,
-    ...(process.env.NODE_ENV === 'development' && { stack: err.stack })
+    requestId
+    // Never include: stack, internal paths, sensitive data
   });
 });
 
