@@ -224,25 +224,28 @@ export class Logger {
       this.logs.shift();
     }
 
-    // Console output based on level
-    const prefix = `[${entry.timestamp.toISOString()}] [${level}]${context ? ` [${context}]` : ''}`;
-
-    switch (level) {
-      case LogLevel.DEBUG:
-        console.debug(prefix, message, data);
-        break;
-      case LogLevel.INFO:
-        console.info(prefix, message, data);
-        break;
-      case LogLevel.WARN:
-        console.warn(prefix, message, data);
-        break;
-      case LogLevel.ERROR:
-        console.error(prefix, message, error || data);
-        break;
-      case LogLevel.FATAL:
-        console.error(prefix, 'FATAL:', message, error || data);
-        break;
+    // Console output removed for production - logs are stored in memory and written to logger
+    // Use the winston logger from utils/logger.ts for production logging
+    if (process.env.NODE_ENV === 'development') {
+      const prefix = `[${entry.timestamp.toISOString()}] [${level}]${context ? ` [${context}]` : ''}`;
+      
+      switch (level) {
+        case LogLevel.DEBUG:
+          console.debug(prefix, message, data);
+          break;
+        case LogLevel.INFO:
+          console.info(prefix, message, data);
+          break;
+        case LogLevel.WARN:
+          console.warn(prefix, message, data);
+          break;
+        case LogLevel.ERROR:
+          console.error(prefix, message, error || data);
+          break;
+        case LogLevel.FATAL:
+          console.error(prefix, 'FATAL:', message, error || data);
+          break;
+      }
     }
   }
 

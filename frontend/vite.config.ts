@@ -40,9 +40,9 @@ export default defineConfig({
   // Build configuration
   build: {
     outDir: 'dist',
-    sourcemap: true, // Generate source maps for debugging
+    sourcemap: process.env.NODE_ENV !== 'production', // Source maps only in dev
     minify: 'esbuild', // Use esbuild for faster minification
-    target: 'esnext',
+    target: 'es2020',
     rollupOptions: {
       output: {
         // Manual chunking for better code splitting
@@ -51,13 +51,23 @@ export default defineConfig({
           'ui-vendor': ['react-icons'],
           'store-vendor': ['zustand'],
           'utils-vendor': ['axios'],
+          'chart-vendor': ['recharts'],
         },
       },
     },
     // Chunk size warnings
-    chunkSizeWarningLimit: 1000,
-    // Better tree shaking
-    reportCompressedSize: false,
+    chunkSizeWarningLimit: 500,
+    // Better tree shaking and compression reporting
+    reportCompressedSize: true,
+    // Improve compression
+    cssCodeSplit: true,
+    // Terser options for production
+    terserOptions: {
+      compress: {
+        drop_console: process.env.NODE_ENV === 'production',
+        drop_debugger: true,
+      },
+    },
   },
 
   // Optimize dependencies

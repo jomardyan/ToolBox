@@ -11,6 +11,7 @@ import logger from './utils/logger';
 import metricsCollector from './utils/metricsCollector';
 import usageTrackingMiddleware from './middleware/usageTracking';
 import quotaEnforcementMiddleware from './middleware/quotaEnforcement';
+import rateLimitByTier from './middleware/rateLimitByTier';
 
 // Import routes
 import authRoutes from './routes/authRoutes';
@@ -78,24 +79,27 @@ app.use((req: Request, res: Response, next: NextFunction) => {
   next();
 });
 
-// Rate limiting with headers
-const limiter = rateLimit({
+// Basic IP-based rate limiting for all API routes (security layer)
+const ipLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
+  max: 200, // Generous limit per IP (tier-based limiting is more granular)
   message: 'Too many requests from this IP, please try again later.',
   standardHeaders: true, // Return rate limit info in RateLimit-* headers
   legacyHeaders: false, // Disable X-RateLimit-* headers
   handler: (req: Request, res: Response) => {
-    logger.warn(`Rate limit exceeded for IP: ${req.ip}, RequestID: ${(req as any).requestId}`);
+    logger.warn(`IP rate limit exceeded for: ${req.ip}, RequestID: ${(req as any).requestId}`);
     res.status(429).json({
       success: false,
-      error: 'Too many requests, please try again later',
+      error: 'Too many requests from this IP, please try again later',
       statusCode: 429,
       requestId: (req as any).requestId
     });
   }
 });
-app.use('/api/', limiter);
+app.use('/api/', ipLimiter);
+
+// Tier-based rate limiting (applied after authentication)
+app.use('/api/', rateLimitByTier);
 
 // Request logging middleware with request ID
 app.use((req: Request, res: Response, next: NextFunction) => {
@@ -118,7 +122,7 @@ app.use(usageTrackingMiddleware);
 app.use(quotaEnforcementMiddleware);
 
 // ===== Health Check =====
-app.get('/health', (req: Request, res: Response) => {
+app.get('/health', (_req: Request, res: Response) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -170,7 +174,7 @@ app.use((req: Request, res: Response) => {
 });
 
 // Global error handler - never expose stack traces
-app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+app.use((err: any, req: Request, res: Response, _next: NextFunction) => {
   const requestId = (req as any).requestId || 'unknown';
   
   // Log full error details internally

@@ -40,20 +40,20 @@ export const Header: React.FC = () => {
               Home
             </Link>
             <Link 
+              to="/converter" 
+              className={`font-medium transition-colors hover:text-blue-600 ${
+                darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700'
+              }`}
+            >
+              Converter
+            </Link>
+            <Link 
               to="/history" 
               className={`font-medium transition-colors hover:text-blue-600 ${
                 darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700'
               }`}
             >
               History
-            </Link>
-            <Link 
-              to="/advanced" 
-              className={`font-medium transition-colors hover:text-blue-600 ${
-                darkMode ? 'text-gray-300 hover:text-blue-400' : 'text-gray-700'
-              }`}
-            >
-              Advanced
             </Link>
             <Link 
               to="/faq" 

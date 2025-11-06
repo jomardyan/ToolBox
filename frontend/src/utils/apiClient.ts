@@ -5,7 +5,7 @@ import type { AxiosInstance } from 'axios';
 
 // Dynamically determine the API base URL based on the current environment
 const getBaseURL = (): string => {
-  // Use environment variable if explicitly set
+  // Use environment variable if explicitly set (production)
   if (import.meta.env.VITE_API_BASE_URL) {
     return import.meta.env.VITE_API_BASE_URL;
   }
@@ -14,14 +14,13 @@ const getBaseURL = (): string => {
   const hostname = window.location.hostname;
   
   if (hostname.includes('.app.github.dev')) {
-    // GitHub Codespaces: Replace port 5173 with 3000 in the hostname
-    // Example: xxx-5173.app.github.dev -> xxx-3000.app.github.dev
+    // GitHub Codespaces: Replace frontend port with backend port
     const baseURL = `https://${hostname.replace('-5173.', '-3000.')}/api`;
     return baseURL;
   }
 
-  // Local development fallback
-  return 'http://localhost:3000/api';
+  // Local development fallback - use environment variable or default
+  return import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 };
 
 const baseURL = getBaseURL();

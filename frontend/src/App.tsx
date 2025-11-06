@@ -3,6 +3,7 @@ import { Header } from './components/Header';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
 import { HomePage } from './pages/HomePage';
+import { LandingPage } from './pages/LandingPage';
 import { HistoryPage } from './pages/HistoryPage';
 import { AdvancedFeaturesPage } from './pages/AdvancedFeaturesPage';
 import { FAQPage } from './pages/FAQPage';
@@ -24,7 +25,8 @@ function App() {
       <Header />
       <Routes>
         {/* PUBLIC Routes - No Authentication Required */}
-        <Route path="/" element={<HomePage />} />
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/converter" element={<HomePage />} />
         <Route path="/history" element={<HistoryPage />} />
         <Route path="/advanced" element={<AdvancedFeaturesPage />} />
         <Route path="/faq" element={<FAQPage />} />
